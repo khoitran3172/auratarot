@@ -1,6 +1,5 @@
 {
   "name": "AURA TAROT",
   "description": "Không gian chiêm bốc huyền học tối giản, tìm kiếm câu trả lời định mệnh thông qua tàng thư luận giải cổ điển chân thật.",
-  "requestFramePermissions": [],
-  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+  "requestFramePermissions": []
 }
