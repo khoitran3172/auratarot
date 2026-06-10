@@ -1,0 +1,12 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "aura-tarot",
+      "runtimeExecutable": "cmd",
+      "runtimeArgs": ["/c", "set NODE_ENV=production&& npx tsx server.ts"],
+      "port": 3000,
+      "autoPort": true
+    }
+  ]
+}
