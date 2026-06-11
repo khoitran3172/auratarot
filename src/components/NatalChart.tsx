@@ -5,7 +5,10 @@ import { computeNatalChart, NatalChart as NatalChartData, ChartAspect } from '..
 import {
   planets, signs, houses, planetInSign, planetInHouse,
   ascendantReadings, aspectInfos, planetAspectEnergy, birthPlaces,
-  PlanetId, SignId, HouseNumber,
+  northNodeInSign, northNodeInHouse, mcInSign,
+  elementReadings, modalityReadings, retrogradeReadings,
+  signRuler, chartRulerReadings, stelliumTemplate,
+  PlanetId, SignId, HouseNumber, ElementName, ModalityName,
 } from '../data/astrology';
 
 const SIGN_ORDER: SignId[] = [
@@ -145,6 +148,14 @@ function ChartWheel({ chart }: { chart: NatalChartData }) {
         );
       })}
 
+      {/* North Node */}
+      {(() => {
+        const [nx, ny] = toXY(chart.northNode.longitude, rPlanet);
+        return (
+          <text x={nx} y={ny} textAnchor="middle" dominantBaseline="central" fontSize="12" fill="#a78bfa">☊</text>
+        );
+      })()}
+
       {/* Ascendant marker */}
       {chart.ascendant && (() => {
         const [x1, y1] = toXY(chart.ascendant.longitude, rAspect);
@@ -157,7 +168,33 @@ function ChartWheel({ chart }: { chart: NatalChartData }) {
           </g>
         );
       })()}
+
+      {/* Midheaven marker */}
+      {chart.midheaven && (() => {
+        const [x1, y1] = toXY(chart.midheaven.longitude, rAspect);
+        const [x2, y2] = toXY(chart.midheaven.longitude, rOuter);
+        const [lx, ly] = toXY(chart.midheaven.longitude, rOuter + 12);
+        return (
+          <g>
+            <line x1={x1} y1={y1} x2={x2} y2={y2} stroke="#e9c349" strokeWidth="1.5" strokeDasharray="4 3" />
+            <text x={lx} y={ly} textAnchor="middle" dominantBaseline="central" fontSize="9" fill="#e9c349" fontFamily="monospace">MC</text>
+          </g>
+        );
+      })()}
     </svg>
+  );
+}
+
+// Horizontal distribution bar used by the element/modality balance blocks
+function BalanceBar({ label, count, total, accent }: { label: string; count: number; total: number; accent: string }) {
+  return (
+    <div className="flex items-center gap-3">
+      <span className="font-mono text-[10px] text-on-surface-variant w-20 shrink-0 uppercase tracking-wider">{label}</span>
+      <div className="flex-1 h-2 rounded-full bg-white/5 overflow-hidden">
+        <div className={`h-full rounded-full ${accent}`} style={{ width: `${(count / total) * 100}%` }} />
+      </div>
+      <span className="font-mono text-[10px] text-on-background w-6 text-right">{count}</span>
+    </div>
   );
 }
 
@@ -204,6 +241,35 @@ export default function NatalChart() {
   const [error, setError] = useState('');
 
   const place = useMemo(() => birthPlaces.find(p => p.name === placeName) || birthPlaces[0], [placeName]);
+
+  // Deep chart analysis: element/modality balance, stelliums, chart ruler, retrogrades
+  const analysis = useMemo(() => {
+    if (!chart) return null;
+
+    const elementCounts: Record<ElementName, number> = { 'Lửa': 0, 'Đất': 0, 'Khí': 0, 'Nước': 0 };
+    const modalityCounts: Record<ModalityName, number> = { 'Tiên phong': 0, 'Kiên định': 0, 'Linh hoạt': 0 };
+    const bySign = new Map<SignId, PlanetId[]>();
+    for (const p of chart.positions) {
+      elementCounts[signs[p.sign].element]++;
+      modalityCounts[signs[p.sign].modality]++;
+      bySign.set(p.sign, [...(bySign.get(p.sign) || []), p.planet]);
+    }
+
+    const maxElement = Math.max(...Object.values(elementCounts));
+    const dominantElements = (Object.keys(elementCounts) as ElementName[]).filter(e => elementCounts[e] === maxElement);
+    const lackingElements = (Object.keys(elementCounts) as ElementName[]).filter(e => elementCounts[e] === 0);
+    const maxModality = Math.max(...Object.values(modalityCounts));
+    const dominantModalities = (Object.keys(modalityCounts) as ModalityName[]).filter(m => modalityCounts[m] === maxModality);
+
+    const stelliums = [...bySign.entries()].filter(([, ps]) => ps.length >= 3);
+
+    const rulerId = chart.ascendant ? signRuler[chart.ascendant.sign] : null;
+    const rulerPos = rulerId ? chart.positions.find(p => p.planet === rulerId)! : null;
+
+    const retros = chart.positions.filter(p => p.retrograde);
+
+    return { elementCounts, modalityCounts, dominantElements, lackingElements, dominantModalities, maxElement, maxModality, stelliums, rulerId, rulerPos, retros };
+  }, [chart]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -356,11 +422,20 @@ export default function NatalChart() {
                     </span>
                   </div>
                 )}
+                {chart.midheaven && (
+                  <div className="flex items-center justify-between py-2 px-3 rounded-lg bg-brand-gold/5 border border-brand-gold/20 text-sm">
+                    <span className="font-sans text-brand-gold font-semibold">★ Thiên Đỉnh (MC)</span>
+                    <span className="font-mono text-xs text-on-background">
+                      {signs[chart.midheaven.sign].glyph} {signs[chart.midheaven.sign].name} {formatDegree(chart.midheaven.degreeInSign)}
+                    </span>
+                  </div>
+                )}
                 {chart.positions.map(p => (
                   <div key={p.planet} className="flex items-center justify-between py-2 px-3 rounded-lg bg-brand-purple/5 border border-brand-gold/10 text-sm">
                     <span className="font-sans text-on-background">
                       <span className="text-brand-gold mr-2">{planets[p.planet].glyph}</span>
                       {planets[p.planet].name}
+                      {p.retrograde && <span className="ml-2 font-mono text-[10px] text-red-400/90">℞ nghịch hành</span>}
                     </span>
                     <span className="font-mono text-xs text-on-surface-variant">
                       {signs[p.sign].glyph} {signs[p.sign].name} {formatDegree(p.degreeInSign)}
@@ -368,6 +443,13 @@ export default function NatalChart() {
                     </span>
                   </div>
                 ))}
+                <div className="flex items-center justify-between py-2 px-3 rounded-lg bg-brand-violet/5 border border-purple-400/20 text-sm">
+                  <span className="font-sans text-purple-300 font-semibold">☊ Bắc Giao Điểm</span>
+                  <span className="font-mono text-xs text-on-background">
+                    {signs[chart.northNode.sign].glyph} {signs[chart.northNode.sign].name} {formatDegree(chart.northNode.degreeInSign)}
+                    {chart.northNode.house ? ` · Nhà ${chart.northNode.house}` : ''}
+                  </span>
+                </div>
                 <p className="font-mono text-[10px] text-on-surface-variant/60 pt-2 leading-relaxed">
                   {chart.ascendant
                     ? 'Hệ nhà: Whole Sign (Nguyên Cung) — mỗi nhà trùng một cung hoàng đạo tính từ Cung Mọc.'
@@ -375,6 +457,95 @@ export default function NatalChart() {
                 </p>
               </div>
             </div>
+
+            {/* Deep chart overview */}
+            {analysis && (
+              <div className="glass-card p-6 md:p-8 rounded-3xl border border-brand-gold/15 space-y-7">
+                <h3 className="font-serif text-2xl text-brand-gold font-bold text-center">
+                  Tổng Quan Tinh Bàn
+                </h3>
+
+                {/* Big three */}
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-center">
+                  {[
+                    { label: 'Mặt Trời — Bản ngã', sign: chart.positions.find(p => p.planet === 'sun')!.sign },
+                    { label: 'Mặt Trăng — Nội tâm', sign: chart.positions.find(p => p.planet === 'moon')!.sign },
+                    chart.ascendant ? { label: 'Cung Mọc — Diện mạo', sign: chart.ascendant.sign } : null,
+                  ].filter(Boolean).map((item: any) => (
+                    <div key={item.label} className="p-4 rounded-2xl bg-brand-purple/10 border border-brand-gold/15 space-y-1">
+                      <span className="font-mono text-[9px] text-on-surface-variant tracking-widest uppercase block">{item.label}</span>
+                      <span className="font-serif text-lg text-brand-gold font-bold block">
+                        {signs[item.sign as SignId].glyph} {signs[item.sign as SignId].name}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Element & modality balance */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                  <div className="space-y-3">
+                    <h4 className="font-mono text-xs text-brand-gold tracking-widest uppercase font-bold">Cân bằng Nguyên Tố</h4>
+                    <BalanceBar label="🔥 Lửa" count={analysis.elementCounts['Lửa']} total={10} accent="bg-red-400/80" />
+                    <BalanceBar label="🌍 Đất" count={analysis.elementCounts['Đất']} total={10} accent="bg-amber-600/80" />
+                    <BalanceBar label="💨 Khí" count={analysis.elementCounts['Khí']} total={10} accent="bg-cyan-400/80" />
+                    <BalanceBar label="🌊 Nước" count={analysis.elementCounts['Nước']} total={10} accent="bg-blue-400/80" />
+                  </div>
+                  <div className="space-y-3">
+                    <h4 className="font-mono text-xs text-brand-gold tracking-widest uppercase font-bold">Cân bằng Thể Thức</h4>
+                    <BalanceBar label="Tiên phong" count={analysis.modalityCounts['Tiên phong']} total={10} accent="bg-brand-gold/80" />
+                    <BalanceBar label="Kiên định" count={analysis.modalityCounts['Kiên định']} total={10} accent="bg-emerald-400/80" />
+                    <BalanceBar label="Linh hoạt" count={analysis.modalityCounts['Linh hoạt']} total={10} accent="bg-violet-400/80" />
+                  </div>
+                </div>
+
+                <div className="space-y-3 text-sm font-sans leading-relaxed text-on-background">
+                  {analysis.dominantElements.map(e => (
+                    <p key={e}><span className="text-brand-gold font-semibold">Nguyên tố {e} chiếm ưu thế ({analysis.elementCounts[e]}/10):</span> {elementReadings[e].dominant}</p>
+                  ))}
+                  {analysis.lackingElements.map(e => (
+                    <p key={e}><span className="text-red-400/90 font-semibold">Thiếu vắng nguyên tố {e}:</span> {elementReadings[e].lacking}</p>
+                  ))}
+                  {analysis.dominantModalities.map(m => (
+                    <p key={m}><span className="text-brand-cyan font-semibold">Thể thức {m} dẫn dắt ({analysis.modalityCounts[m]}/10):</span> {modalityReadings[m].dominant}</p>
+                  ))}
+                </div>
+
+                {/* Chart ruler */}
+                {analysis.rulerId && analysis.rulerPos && (
+                  <div className="p-4 rounded-2xl bg-brand-gold/5 border border-brand-gold/20 text-sm font-sans leading-relaxed space-y-1">
+                    <span className="font-mono text-[10px] text-brand-gold tracking-widest uppercase font-bold block">
+                      Chủ Tinh Bản Đồ: {planets[analysis.rulerId].glyph} {planets[analysis.rulerId].name}
+                    </span>
+                    <p className="text-on-background">
+                      Cung Mọc {signs[chart.ascendant!.sign].name} được dẫn dắt bởi {planets[analysis.rulerId].name} — hiện tọa tại {signs[analysis.rulerPos.sign].name}{analysis.rulerPos.house ? `, Nhà ${analysis.rulerPos.house}` : ''}. {chartRulerReadings[analysis.rulerId]}
+                    </p>
+                  </div>
+                )}
+
+                {/* Stelliums */}
+                {analysis.stelliums.map(([signId, planetIds]) => (
+                  <div key={signId} className="p-4 rounded-2xl bg-brand-violet/5 border border-purple-400/20 text-sm font-sans leading-relaxed space-y-1">
+                    <span className="font-mono text-[10px] text-purple-300 tracking-widest uppercase font-bold block">
+                      ✨ Stellium tại {signs[signId].name} ({planetIds.map(p => planets[p].name).join(', ')})
+                    </span>
+                    <p className="text-on-background">{stelliumTemplate} Với bạn, vùng hội tụ ấy mang trọn màu sắc {signs[signId].name}: {signs[signId].traits}</p>
+                  </div>
+                ))}
+
+                {/* Retrogrades */}
+                {analysis.retros.length > 0 && (
+                  <div className="space-y-2 text-sm font-sans leading-relaxed">
+                    <h4 className="font-mono text-xs text-red-400/90 tracking-widest uppercase font-bold">℞ Hành tinh nghịch hành lúc chào đời ({analysis.retros.length})</h4>
+                    {analysis.retros.map(p => (
+                      <p key={p.planet} className="text-on-background">
+                        <span className="text-brand-gold font-semibold">{planets[p.planet].glyph} {planets[p.planet].name} ℞:</span>{' '}
+                        {retrogradeReadings[p.planet as keyof typeof retrogradeReadings]}
+                      </p>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
 
             {/* Interpretations */}
             <div className="space-y-4">
@@ -393,6 +564,37 @@ export default function NatalChart() {
                 </ReadingCard>
               )}
 
+              {/* Midheaven */}
+              {chart.midheaven && (
+                <ReadingCard
+                  heading={`★ ${mcInSign[chart.midheaven.sign].title}`}
+                  sub="THIÊN ĐỈNH — SỰ NGHIỆP & DI SẢN CÔNG KHAI"
+                >
+                  <p>{mcInSign[chart.midheaven.sign].description}</p>
+                  <p className="text-brand-cyan/90 italic">✦ {mcInSign[chart.midheaven.sign].advice}</p>
+                </ReadingCard>
+              )}
+
+              {/* North Node */}
+              <ReadingCard
+                heading={`☊ ${northNodeInSign[chart.northNode.sign].title}`}
+                sub="BẮC GIAO ĐIỂM — HƯỚNG TIẾN HÓA CỦA LINH HỒN"
+              >
+                <p>{northNodeInSign[chart.northNode.sign].description}</p>
+                {chart.northNode.house && (
+                  <div className="border-t border-brand-gold/10 pt-3 space-y-2">
+                    <p className="font-mono text-[10px] text-brand-cyan tracking-wider uppercase">
+                      {northNodeInHouse[chart.northNode.house].title}
+                    </p>
+                    <p>{northNodeInHouse[chart.northNode.house].description}</p>
+                  </div>
+                )}
+                <p className="text-brand-cyan/90 italic">
+                  ✦ {northNodeInSign[chart.northNode.sign].advice}
+                  {chart.northNode.house ? ` ${northNodeInHouse[chart.northNode.house].advice}` : ''}
+                </p>
+              </ReadingCard>
+
               {/* Planets */}
               {chart.positions.map(p => {
                 const inSign = planetInSign[p.planet][p.sign];
@@ -406,6 +608,9 @@ export default function NatalChart() {
                     <p>{inSign.description}</p>
                     <p><span className="text-brand-gold font-semibold">Điểm sáng:</span> {inSign.strengths}</p>
                     <p><span className="text-red-400/90 font-semibold">Vùng tối:</span> {inSign.challenges}</p>
+                    {p.retrograde && (
+                      <p><span className="text-red-400/90 font-semibold">℞ Nghịch hành:</span> {retrogradeReadings[p.planet as keyof typeof retrogradeReadings]}</p>
+                    )}
                     {inHouse && (
                       <div className="border-t border-brand-gold/10 pt-3 space-y-2">
                         <p className="font-mono text-[10px] text-brand-cyan tracking-wider uppercase">{inHouse.title}</p>
