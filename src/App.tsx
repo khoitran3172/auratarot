@@ -3,20 +3,24 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, lazy, Suspense } from 'react';
 import ReadingRoom from './components/ReadingRoom';
 import DailyHoroscope from './components/DailyHoroscope';
 import TarotJournal from './components/TarotJournal';
 import TarotEncyclopedia from './components/TarotEncyclopedia';
 import { ReadingHistory } from './types';
-import { Compass, Sun, BookOpen, NotebookPen } from 'lucide-react';
+import { Compass, Sun, Orbit, BookOpen, NotebookPen, Sparkles } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 
-type View = 'Reading' | 'Daily' | 'Journal' | 'Library';
+// Natal chart bundles the astronomy engine + a large interpretation dataset — load it on demand
+const NatalChart = lazy(() => import('./components/NatalChart'));
+
+type View = 'Reading' | 'Daily' | 'Chart' | 'Journal' | 'Library';
 
 const navItems: { view: View; label: string; icon: typeof Compass }[] = [
   { view: 'Reading', label: 'Trải bài', icon: Compass },
   { view: 'Daily', label: 'Dự báo ngày', icon: Sun },
+  { view: 'Chart', label: 'Bản đồ sao', icon: Orbit },
   { view: 'Journal', label: 'Nhật ký', icon: NotebookPen },
   { view: 'Library', label: 'Thư viện', icon: BookOpen },
 ];
@@ -136,6 +140,25 @@ export default function App() {
               transition={{ duration: 0.4 }}
             >
               <DailyHoroscope />
+            </motion.div>
+          )}
+
+          {currentView === 'Chart' && (
+            <motion.div
+              key="chart"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.4 }}
+            >
+              <Suspense fallback={
+                <div className="flex flex-col items-center justify-center py-32 gap-4">
+                  <Sparkles className="w-8 h-8 text-brand-gold animate-pulse" />
+                  <span className="font-mono text-xs text-brand-gold tracking-widest uppercase">Đang triệu hồi tinh bàn...</span>
+                </div>
+              }>
+                <NatalChart />
+              </Suspense>
             </motion.div>
           )}
 
