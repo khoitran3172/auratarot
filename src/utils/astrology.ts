@@ -7,6 +7,14 @@ export interface PlanetPosition {
   sign: SignId;
   degreeInSign: number; // 0-30
   house: HouseNumber | null; // null when birth time unknown
+  retrograde: boolean;
+}
+
+export interface ChartPoint {
+  longitude: number;
+  sign: SignId;
+  degreeInSign: number;
+  house: HouseNumber | null;
 }
 
 export interface ChartAspect {
@@ -19,6 +27,8 @@ export interface ChartAspect {
 export interface NatalChart {
   positions: PlanetPosition[];
   ascendant: { longitude: number; sign: SignId; degreeInSign: number } | null;
+  midheaven: { longitude: number; sign: SignId; degreeInSign: number } | null;
+  northNode: ChartPoint;
   aspects: ChartAspect[];
 }
 
@@ -65,19 +75,39 @@ const eclipticLongitude = (body: Body, date: Date): number => {
   return normalize(Ecliptic(vector).elon);
 };
 
+const OBLIQUITY_RAD = (23.4367 * Math.PI) / 180; // mean obliquity, adequate for natal charts
+
+// Right Ascension of the Midheaven, degrees
+const computeRAMC = (date: Date, lon: number): number => {
+  const gastHours = SiderealTime(date); // Greenwich apparent sidereal time, hours
+  return normalize(gastHours * 15 + lon);
+};
+
 // Ascendant from local sidereal time + latitude (standard formula, true ecliptic of date)
 const computeAscendant = (date: Date, lat: number, lon: number): number => {
-  const gastHours = SiderealTime(date); // Greenwich apparent sidereal time, hours
-  const ramc = normalize(gastHours * 15 + lon); // Right Ascension of the MC, degrees
-  const eps = (23.4367 * Math.PI) / 180; // mean obliquity, adequate for natal charts
-  const ramcRad = (ramc * Math.PI) / 180;
+  const ramcRad = (computeRAMC(date, lon) * Math.PI) / 180;
   const latRad = (lat * Math.PI) / 180;
 
   const asc = Math.atan2(
     Math.cos(ramcRad),
-    -(Math.sin(ramcRad) * Math.cos(eps) + Math.tan(latRad) * Math.sin(eps))
+    -(Math.sin(ramcRad) * Math.cos(OBLIQUITY_RAD) + Math.tan(latRad) * Math.sin(OBLIQUITY_RAD))
   );
   return normalize((asc * 180) / Math.PI);
+};
+
+// Midheaven (MC) ecliptic longitude from the RAMC
+const computeMidheaven = (date: Date, lon: number): number => {
+  const ramcRad = (computeRAMC(date, lon) * Math.PI) / 180;
+  const mc = Math.atan2(Math.sin(ramcRad), Math.cos(ramcRad) * Math.cos(OBLIQUITY_RAD));
+  return normalize((mc * 180) / Math.PI);
+};
+
+// Mean lunar North Node longitude (Meeus, Astronomical Algorithms ch. 47)
+const computeMeanNorthNode = (date: Date): number => {
+  const jd = date.getTime() / 86400000 + 2440587.5;
+  const T = (jd - 2451545) / 36525;
+  const omega = 125.0445479 - 1934.1362891 * T + 0.0020754 * T * T + (T ** 3) / 467441 - (T ** 4) / 60616000;
+  return normalize(omega);
 };
 
 // Whole-sign house of a longitude given the ascendant sign index
@@ -107,25 +137,49 @@ export function computeNatalChart(
   const date = new Date(utcMillis);
 
   let ascendant: NatalChart['ascendant'] = null;
+  let midheaven: NatalChart['midheaven'] = null;
   let ascSignIndex = 0;
   if (hasTime && place) {
     const ascLon = computeAscendant(date, place.lat, place.lon);
     const { sign, degreeInSign } = longitudeToSign(ascLon);
     ascendant = { longitude: ascLon, sign, degreeInSign };
     ascSignIndex = Math.floor(ascLon / 30);
+
+    const mcLon = computeMidheaven(date, place.lon);
+    const mcSign = longitudeToSign(mcLon);
+    midheaven = { longitude: mcLon, sign: mcSign.sign, degreeInSign: mcSign.degreeInSign };
   }
 
+  // Retrograde: ecliptic longitude decreasing over one day
+  const dayLater = new Date(date.getTime() + 86400000);
   const positions: PlanetPosition[] = PLANET_BODIES.map(({ id, body }) => {
     const lonDeg = eclipticLongitude(body, date);
     const { sign, degreeInSign } = longitudeToSign(lonDeg);
+    let retrograde = false;
+    if (id !== 'sun' && id !== 'moon') {
+      let delta = eclipticLongitude(body, dayLater) - lonDeg;
+      if (delta > 180) delta -= 360;
+      if (delta < -180) delta += 360;
+      retrograde = delta < 0;
+    }
     return {
       planet: id,
       longitude: lonDeg,
       sign,
       degreeInSign,
       house: ascendant ? wholeSignHouse(lonDeg, ascSignIndex) : null,
+      retrograde,
     };
   });
+
+  const nodeLon = computeMeanNorthNode(date);
+  const nodeSign = longitudeToSign(nodeLon);
+  const northNode: ChartPoint = {
+    longitude: nodeLon,
+    sign: nodeSign.sign,
+    degreeInSign: nodeSign.degreeInSign,
+    house: ascendant ? wholeSignHouse(nodeLon, ascSignIndex) : null,
+  };
 
   // Aspects between every planet pair
   const aspects: ChartAspect[] = [];
@@ -148,5 +202,5 @@ export function computeNatalChart(
     }
   }
 
-  return { positions, ascendant, aspects };
+  return { positions, ascendant, midheaven, northNode, aspects };
 }
