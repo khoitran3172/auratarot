@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+﻿import { useState, useRef, useEffect } from 'react';
 import { tarotCards } from '../data/cards';
 import { getLocalDateString } from '../utils/date';
 import { TarotCard, ChatMessage, ReadingHistory } from '../types';
@@ -9,6 +9,11 @@ import { motion, AnimatePresence } from 'motion/react';
 interface ReadingRoomProps {
   onSaveReading: (reading: ReadingHistory) => void;
 }
+
+const CARD_BACK_URL = "https://lh3.googleusercontent.com/aida-public/AB6AXuDEksTacBFqLO079ouUC5XRH2G8JfCNH4ZhLCcrJL6joiyeHhvoPZg2vJ0beTv6Tnp1hQZbdd94T8FLa2PJaJxl_V4Yx0FSbi1xat6Ku2XUdMEhPU5mr-j4xk81Sz2il94koBoIK98fYrBDe9E3Rjm7Pykln3OiHSFPquKEhwCd1P1L6bcQifSupbL3zJrB8FVWZ7JP9GKz7lxQwx2sfX1FJIeKcfyhD9rySUFG4CvZKIp9nZ5o38TE05Y1Z8BaC2jon60oF9uxLvk";
+
+// Number of face-down cards shown in the pick fan
+const FAN_SIZE = 52;
 
 const aspects = [
   { id: 'Tình yêu', label: 'Tình yêu' },
@@ -237,6 +242,8 @@ export default function ReadingRoom({ onSaveReading }: ReadingRoomProps) {
   const [drawnCards, setDrawnCards] = useState<TarotCard[]>([]);
   const [orientations, setOrientations] = useState<('upright' | 'reversed')[]>([]);
   const [flipped, setFlipped] = useState<boolean[]>([]);
+  // Fan indices the user has picked, in pick order — slot i shows the card picked i-th
+  const [pickedFan, setPickedFan] = useState<number[]>([]);
   const [shufflingCount, setShufflingCount] = useState(0);
   const [remainingSlots, setRemainingSlots] = useState<number>(3);
   const [isResonantSession, setIsResonantSession] = useState(false);
@@ -405,16 +412,33 @@ export default function ReadingRoom({ onSaveReading }: ReadingRoomProps) {
     const generatedOrientations = new Array(cardCount).fill(null).map(() => Math.random() > 0.25 ? 'upright' : 'reversed');
     setOrientations(generatedOrientations);
     setFlipped(new Array(cardCount).fill(false));
+    setPickedFan([]);
     setStep('draw');
   };
 
-  // Handle single card flip interaction
-  const handleCardClick = (index: number) => {
+  // Pick a face-down card from the fan — it flies into the next empty slot
+  const handleFanPick = (fanIndex: number) => {
     if (step !== 'draw') return;
-    const nextFlipped = [...flipped];
-    nextFlipped[index] = true;
-    setFlipped(nextFlipped);
+    if (pickedFan.includes(fanIndex)) return;
+    if (pickedFan.length >= drawnCards.length) return;
+    setPickedFan(prev => [...prev, fanIndex]);
   };
+
+  // Once every slot is filled, flip the cards one by one
+  useEffect(() => {
+    if (step !== 'draw' || drawnCards.length === 0) return;
+    if (pickedFan.length !== drawnCards.length) return;
+    const timers = drawnCards.map((_, i) =>
+      setTimeout(() => {
+        setFlipped(prev => {
+          const next = [...prev];
+          next[i] = true;
+          return next;
+        });
+      }, 700 + i * 400)
+    );
+    return () => timers.forEach(clearTimeout);
+  }, [pickedFan, step, drawnCards.length]);
 
   const allCardsFlipped = flipped.length > 0 && flipped.every(f => f === true);
 
@@ -546,6 +570,7 @@ export default function ReadingRoom({ onSaveReading }: ReadingRoomProps) {
     setDrawnCards([]);
     setOrientations([]);
     setFlipped([]);
+    setPickedFan([]);
     setChatHistory([]);
   };
 
@@ -754,28 +779,25 @@ export default function ReadingRoom({ onSaveReading }: ReadingRoomProps) {
           </motion.div>
         )}
 
-        {/* Step 3: Face-down Card Spread & drawing phase */}
+        {/* Step 3: Fan-pick drawing phase — pick your own cards from the fanned deck */}
         {step === 'draw' && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="w-full text-center space-y-12"
+            className="w-full text-center space-y-8"
           >
             <div className="space-y-3">
               <span className="font-mono text-xs text-brand-gold tracking-[0.2em] font-semibold uppercase block">
                 CƠ HỘI CHẠM ĐỊNH MỆNH
               </span>
               <h2 className="font-serif text-3xl md:text-4xl text-brand-gold font-bold">
-                Chọn &amp; Lật các lá bài định mệnh
+                Tự tay chọn {drawnCards.length} lá bài định mệnh
               </h2>
               <p className="font-sans text-sm text-on-surface-variant max-w-md mx-auto">
-                {spreadType === '1-card' 
-                  ? 'Hãy chạm vào lá bài duy nhất để mở năng lượng định quang.'
-                  : spreadType === '3-cards'
-                  ? 'Trước mắt bạn là 3 dòng thời gian mờ ảo. Nhấp chuột vào mỗi lá để lật mở hào quang chiêm tinh.'
-                  : 'Sơ đồ gồm 10 lá phân bố. Hãy nhấp chuột vào từng lá bài để nhận diện dòng chuyển dịch sự việc.'
-                }
+                {pickedFan.length < drawnCards.length
+                  ? `Hãy để trực giác dẫn lối — chạm vào ${drawnCards.length - pickedFan.length} lá bài còn lại trong quạt bài bên dưới.`
+                  : 'Các lá bài đã an vị. Vũ trụ đang lật mở thông điệp của bạn...'}
               </p>
               {isResonantSession && (
                 <div className="max-w-md mx-auto px-4 py-2.5 rounded-full border border-brand-gold/30 bg-brand-gold/5 flex items-center justify-center gap-2 mt-4 shadow-[0_0_15px_rgba(233,195,73,0.06)] animate-pulse">
@@ -785,169 +807,80 @@ export default function ReadingRoom({ onSaveReading }: ReadingRoomProps) {
               )}
             </div>
 
-            {/* Celtic 10-cards spread draw layout */}
-            {spreadType === '10-cards' ? (
-              <div className="space-y-12 max-w-6xl mx-auto">
-                <div className="space-y-4">
-                  <span className="font-mono text-xs text-brand-gold tracking-widest uppercase bg-brand-gold/10 px-4 py-1 rounded-full border border-brand-gold/15">
-                    Thần Mặt Trời - Vị trí thập tự quy tâm (Lá 1 - 6)
-                  </span>
-                  <div className="flex flex-wrap justify-center items-center gap-4 perspective-1000 py-2">
-                    {[0, 1, 2, 3, 4, 5].map((idx) => (
-                      <div key={idx} className="flex flex-col items-center gap-2 w-28 md:w-36">
-                        <span className="font-mono text-[9px] text-brand-gold tracking-wider truncate w-full text-center block bg-brand-void/80 border border-brand-gold/15 py-1 px-1.5 rounded">
-                          {getPositionLabel(idx)}
-                        </span>
-                        <div
-                          onClick={() => handleCardClick(idx)}
-                          className={`w-24 h-40 md:w-32 md:h-52 cursor-pointer group ${!flipped[idx] ? 'hover:scale-105 active:scale-95 transition-transform duration-300' : ''}`}
-                        >
-                          <div className={`card-inner relative w-full h-full text-center transition-transform duration-700 transform-style-3d ${flipped[idx] ? 'rotate-y-180' : ''}`}>
-                            <div className="absolute inset-0 backface-hidden rounded-2xl glass-card border border-brand-gold/30 hover:border-brand-gold flex items-center justify-center p-1 group-hover:gold-glow transition-all">
-                              <img
-                                src="https://lh3.googleusercontent.com/aida-public/AB6AXuDEksTacBFqLO079ouUC5XRH2G8JfCNH4ZhLCcrJL6joiyeHhvoPZg2vJ0beTv6Tnp1hQZbdd94T8FLa2PJaJxl_V4Yx0FSbi1xat6Ku2XUdMEhPU5mr-j4xk81Sz2il94koBoIK98fYrBDe9E3Rjm7Pykln3OiHSFPquKEhwCd1P1L6bcQifSupbL3zJrB8FVWZ7JP9GKz7lxQwx2sfX1FJIeKcfyhD9rySUFG4CvZKIp9nZ5o38TE05Y1Z8BaC2jon60oF9uxLvk"
-                                alt="Card back"
-                                referrerPolicy="no-referrer"
-                                className="w-full h-full object-cover rounded-xl"
-                              />
-                            </div>
-                            <div className="absolute inset-0 backface-hidden rotate-y-180 rounded-2xl bg-[#09091d] border border-brand-gold/45 p-1 shadow-[0_0_25px_rgba(197,160,89,0.2)] flex flex-col items-center justify-between">
-                              <img
-                                src={drawnCards[idx]?.image}
-                                alt={drawnCards[idx]?.name}
-                                referrerPolicy="no-referrer"
-                                className="w-full h-[70%] object-cover rounded-xl"
-                              />
-                              <div className="pb-1 w-full text-center font-sans">
-                                <h4 className="font-serif text-white text-[10px] md:text-xs font-bold truncate px-1 white-space-nowrap">
-                                  {drawnCards[idx]?.name}
-                                </h4>
-                                <span className="font-mono text-[8px] text-brand-gold block shrink-0 leading-none">
-                                  {orientations[idx] === 'reversed' ? 'Ngược (Rev)' : 'Xuôi (Upr)'}
-                                </span>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                        <span className={`font-mono text-[8px] ${flipped[idx] ? 'text-green-400 font-semibold' : 'text-brand-gold/40 animate-pulse'}`}>
-                          {flipped[idx] ? 'ĐÃ LẬT' : 'CHƯA LẬT'}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="space-y-4">
-                  <span className="font-mono text-xs text-brand-cyan tracking-widest uppercase bg-brand-cyan/10 px-4 py-1 rounded-full border border-brand-cyan/15">
-                    Hành trình cột quyền năng thăng tiến (Lá 7 - 10)
-                  </span>
-                  <div className="flex flex-wrap justify-center items-center gap-4 perspective-1000 py-2">
-                    {[6, 7, 8, 9].map((idx) => (
-                      <div key={idx} className="flex flex-col items-center gap-2 w-28 md:w-36">
-                        <span className="font-mono text-[9px] text-brand-cyan tracking-wider truncate w-full text-center block bg-brand-void/80 border border-brand-cyan/15 py-1 px-1.5 rounded">
-                          {getPositionLabel(idx)}
-                        </span>
-                        <div
-                          onClick={() => handleCardClick(idx)}
-                          className={`w-24 h-40 md:w-32 md:h-52 cursor-pointer group ${!flipped[idx] ? 'hover:scale-105 active:scale-95 transition-transform duration-300' : ''}`}
-                        >
-                          <div className={`card-inner relative w-full h-full text-center transition-transform duration-700 transform-style-3d ${flipped[idx] ? 'rotate-y-180' : ''}`}>
-                            <div className="absolute inset-0 backface-hidden rounded-2xl glass-card border border-brand-gold/30 hover:border-brand-gold flex items-center justify-center p-1 group-hover:gold-glow transition-all">
-                              <img
-                                src="https://lh3.googleusercontent.com/aida-public/AB6AXuDEksTacBFqLO079ouUC5XRH2G8JfCNH4ZhLCcrJL6joiyeHhvoPZg2vJ0beTv6Tnp1hQZbdd94T8FLa2PJaJxl_V4Yx0FSbi1xat6Ku2XUdMEhPU5mr-j4xk81Sz2il94koBoIK98fYrBDe9E3Rjm7Pykln3OiHSFPquKEhwCd1P1L6bcQifSupbL3zJrB8FVWZ7JP9GKz7lxQwx2sfX1FJIeKcfyhD9rySUFG4CvZKIp9nZ5o38TE05Y1Z8BaC2jon60oF9uxLvk"
-                                alt="Card back"
-                                referrerPolicy="no-referrer"
-                                className="w-full h-full object-cover rounded-xl"
-                              />
-                            </div>
-                            <div className="absolute inset-0 backface-hidden rotate-y-180 rounded-2xl bg-[#09091d] border border-brand-gold/45 p-1 shadow-[0_0_25px_rgba(197,160,89,0.2)] flex flex-col items-center justify-between">
-                              <img
-                                src={drawnCards[idx]?.image}
-                                alt={drawnCards[idx]?.name}
-                                referrerPolicy="no-referrer"
-                                className="w-full h-[70%] object-cover rounded-xl"
-                              />
-                              <div className="pb-1 w-full text-center font-sans">
-                                <h4 className="font-serif text-white text-[10px] md:text-xs font-bold truncate px-1 white-space-nowrap">
-                                  {drawnCards[idx]?.name}
-                                </h4>
-                                <span className="font-mono text-[8px] text-brand-gold block shrink-0 leading-none">
-                                  {orientations[idx] === 'reversed' ? 'Ngược (Rev)' : 'Xuôi (Upr)'}
-                                </span>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                        <span className={`font-mono text-[8px] ${flipped[idx] ? 'text-green-400 font-semibold' : 'text-brand-gold/40 animate-pulse'}`}>
-                          {flipped[idx] ? 'ĐÃ LẬT' : 'CHƯA LẬT'}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            ) : (
-              /* Draw layout for 1-card and 3-cards draw */
-              <div className="flex flex-wrap justify-center items-center gap-6 md:gap-10 perspective-1000 py-6">
-                {drawnCards.map((_, idx) => (
-                  <div key={idx} className="flex flex-col items-center gap-4">
-                    <span className="font-mono text-[10px] text-brand-gold tracking-widest uppercase bg-brand-gold/10 block px-4 py-1.5 rounded-full border border-brand-gold/15">
+            {/* Destination slots */}
+            <div className={`grid gap-3 md:gap-5 max-w-5xl mx-auto justify-items-center ${
+              drawnCards.length === 1 ? 'grid-cols-1' : drawnCards.length === 3 ? 'grid-cols-3' : 'grid-cols-3 sm:grid-cols-5'
+            }`}>
+              {drawnCards.map((card, idx) => {
+                const isFilled = idx < pickedFan.length;
+                return (
+                  <div key={idx} className="flex flex-col items-center gap-2 w-full">
+                    <span className="font-mono text-[9px] md:text-[10px] text-brand-gold tracking-wider truncate max-w-full text-center block bg-brand-void/80 border border-brand-gold/15 py-1 px-2 rounded">
                       {getPositionLabel(idx)}
                     </span>
-
-                    <div
-                      onClick={() => handleCardClick(idx)}
-                      className={`w-28 h-48 md:w-44 md:h-72 cursor-pointer group ${!flipped[idx] ? 'hover:scale-105 active:scale-95 transition-transform duration-300' : ''}`}
-                    >
-                      <div className={`card-inner relative w-full h-full text-center transition-transform duration-700 transform-style-3d ${flipped[idx] ? 'rotate-y-180' : ''}`}>
-                        
-                        {/* Back side of card (FACE DOWN) */}
-                        <div className="absolute inset-0 backface-hidden rounded-2xl glass-card border border-brand-gold/30 hover:border-brand-gold flex items-center justify-center p-1 group-hover:gold-glow transition-all">
-                          <div className="absolute inset-2 border border-brand-gold/15 rounded-xl"></div>
-                          <img
-                            src="https://lh3.googleusercontent.com/aida-public/AB6AXuDEksTacBFqLO079ouUC5XRH2G8JfCNH4ZhLCcrJL6joiyeHhvoPZg2vJ0beTv6Tnp1hQZbdd94T8FLa2PJaJxl_V4Yx0FSbi1xat6Ku2XUdMEhPU5mr-j4xk81Sz2il94koBoIK98fYrBDe9E3Rjm7Pykln3OiHSFPquKEhwCd1P1L6bcQifSupbL3zJrB8FVWZ7JP9GKz7lxQwx2sfX1FJIeKcfyhD9rySUFG4CvZKIp9nZ5o38TE05Y1Z8BaC2jon60oF9uxLvk"
-                            alt="Card back"
-                            referrerPolicy="no-referrer"
-                            className="w-full h-full object-cover rounded-xl"
-                          />
-                        </div>
-
-                        {/* Front side of card (FACE UP - REVEALED) */}
-                        <div className="absolute inset-0 backface-hidden rotate-y-180 rounded-2xl bg-[#09091d] border border-brand-gold/45 p-1 shadow-[0_0_25px_rgba(197,160,89,0.2)] flex flex-col items-center justify-between">
-                          <img
-                            src={drawnCards[idx]?.image}
-                            alt={drawnCards[idx]?.name}
-                            referrerPolicy="no-referrer"
-                            className="w-full h-[75%] object-cover rounded-xl"
-                          />
-                          <div className="pb-2 w-full text-center">
-                            <h4 className="font-serif text-white text-xs md:text-sm font-bold truncate px-1">
-                              {drawnCards[idx]?.name}
-                            </h4>
-                            <span className="font-mono text-[9px] text-brand-gold block truncate">
-                              {drawnCards[idx]?.englishName}
-                            </span>
-                            <span className="font-mono text-[8px] text-gray-400 block mt-0.5">
-                              {orientations[idx] === 'reversed' ? 'Chiêu ngược' : 'Chiều xuôi'}
-                            </span>
+                    <div className={`${drawnCards.length === 10 ? 'w-20 h-32 md:w-24 md:h-40' : 'w-24 h-40 md:w-36 md:h-60'} perspective-1000`}>
+                      {isFilled ? (
+                        <motion.div
+                          initial={{ y: 180, scale: 0.5, opacity: 0, rotate: -8 }}
+                          animate={{ y: 0, scale: 1, opacity: 1, rotate: 0 }}
+                          transition={{ type: 'spring', stiffness: 240, damping: 22 }}
+                          className="w-full h-full"
+                        >
+                          <div className={`card-inner relative w-full h-full text-center transition-transform duration-700 transform-style-3d ${flipped[idx] ? 'rotate-y-180' : ''}`}>
+                            {/* Back */}
+                            <div className="absolute inset-0 backface-hidden rounded-xl glass-card border border-brand-gold/40 p-1 shadow-[0_0_20px_rgba(233,195,73,0.15)]">
+                              <img src={CARD_BACK_URL} alt="Card back" referrerPolicy="no-referrer" className="w-full h-full object-cover rounded-lg" />
+                            </div>
+                            {/* Front */}
+                            <div className="absolute inset-0 backface-hidden rotate-y-180 rounded-xl bg-[#09091d] border border-brand-gold/45 p-1 shadow-[0_0_25px_rgba(197,160,89,0.2)] flex flex-col items-center justify-between">
+                              <img src={card.image} alt={card.name} referrerPolicy="no-referrer" className="w-full h-[72%] object-cover rounded-lg" />
+                              <div className="pb-1 w-full text-center font-sans">
+                                <h4 className="font-serif text-white text-[10px] md:text-xs font-bold truncate px-1">{card.name}</h4>
+                                <span className="font-mono text-[8px] text-brand-gold block leading-none">
+                                  {orientations[idx] === 'reversed' ? 'Ngược (Rev)' : 'Xuôi (Upr)'}
+                                </span>
+                              </div>
+                            </div>
                           </div>
+                        </motion.div>
+                      ) : (
+                        <div className="w-full h-full rounded-xl border-2 border-dashed border-brand-gold/25 bg-brand-gold/[0.03] flex items-center justify-center">
+                          <Sparkles className="w-5 h-5 text-brand-gold/25" />
                         </div>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
 
+            {/* Card fan */}
+            {pickedFan.length < drawnCards.length && (
+              <div className="relative h-44 md:h-52 max-w-4xl mx-auto overflow-visible select-none" style={{ touchAction: 'manipulation' }}>
+                {Array.from({ length: FAN_SIZE }).map((_, j) => {
+                  if (pickedFan.includes(j)) return null;
+                  const t = j / (FAN_SIZE - 1);
+                  const ang = -62 + 124 * t;
+                  const rad = (ang * Math.PI) / 180;
+                  const lift = (Math.cos(rad) - Math.cos((62 * Math.PI) / 180)) * 130;
+                  return (
+                    <div
+                      key={j}
+                      onClick={() => handleFanPick(j)}
+                      className="absolute w-14 h-24 md:w-16 md:h-28 cursor-pointer group/fan"
+                      style={{
+                        left: `calc(50% + ${(Math.sin(rad) * 44).toFixed(2)}% - 28px)`,
+                        bottom: `${lift.toFixed(1)}px`,
+                        transform: `rotate(${(ang * 0.55).toFixed(1)}deg)`,
+                        zIndex: 10 + j,
+                      }}
+                    >
+                      <div className="w-full h-full rounded-lg border border-brand-gold/30 bg-brand-purple/40 shadow-md overflow-hidden group-hover/fan:border-brand-gold group-hover/fan:shadow-[0_0_15px_rgba(233,195,73,0.35)] group-hover/fan:-translate-y-4 transition-all duration-200">
+                        <img src={CARD_BACK_URL} alt="Card back" referrerPolicy="no-referrer" className="w-full h-full object-cover pointer-events-none" />
                       </div>
                     </div>
-
-                    {!flipped[idx] ? (
-                      <span className="font-mono text-[9px] text-brand-gold/50 animate-pulse uppercase tracking-wider">
-                        Bấm Đóng Lật
-                      </span>
-                    ) : (
-                      <span className="font-mono text-[9px] text-green-400 font-semibold flex items-center gap-1">
-                        <Check className="w-3 h-3" /> ĐÃ LẬT
-                      </span>
-                    )}
-
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             )}
 
@@ -955,11 +888,11 @@ export default function ReadingRoom({ onSaveReading }: ReadingRoomProps) {
               <motion.div
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
-                className="pt-6"
+                className="pt-4"
               >
                 <button
                   onClick={requestAiTarotReading}
-                  className="px-12 py-4 rounded-xl font-mono text-xs tracking-[0.25em] font-bold text-brand-gold hover:text-brand-cyan border border-brand-gold/30 hover:border-brand-cyan bg-brand-gold/10 hover:bg-brand-cyan/10 transition-colors tracking-widest cursor-pointer shadow-[0_0_20px_rgba(233,195,73,0.15)] uppercase"
+                  className="px-12 py-4 rounded-xl font-mono text-xs tracking-[0.25em] font-bold text-brand-gold hover:text-brand-cyan border border-brand-gold/30 hover:border-brand-cyan bg-brand-gold/10 hover:bg-brand-cyan/10 transition-colors cursor-pointer shadow-[0_0_20px_rgba(233,195,73,0.15)] uppercase"
                 >
                   Giải mã chiêm bói từ Tàng Thư
                 </button>
@@ -967,6 +900,7 @@ export default function ReadingRoom({ onSaveReading }: ReadingRoomProps) {
             )}
           </motion.div>
         )}
+
 
         {/* Step 4: Split-screen Reading Room & Follow-up Conversation */}
         {step === 'reading' && (
