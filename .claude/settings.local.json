@@ -1,7 +1,8 @@
 {
   "permissions": {
     "allow": [
-      "PowerShell(npm install express-rate-limit)"
+      "PowerShell(npm install express-rate-limit)",
+      "PowerShell($p = Invoke-WebRequest -Uri \"https://khoitran3172.github.io/auratarot/\" -UseBasicParsing -TimeoutSec 20; \"live: HTTP $\\($p.StatusCode\\)\"; $js = [regex]::Match\\($p.Content, 'src=\"\\(/auratarot/assets/index[^\"]+\\\\.js\\)\"'\\).Groups[1].Value; $main = Invoke-WebRequest -Uri \"https://khoitran3172.github.io$js\" -UseBasicParsing -TimeoutSec 20; if \\($main.Content -match 'NatalChart'\\) { \"ban do sao: co tren ban live\" })"
     ]
   }
 }
