@@ -9,20 +9,22 @@ import DailyHoroscope from './components/DailyHoroscope';
 import TarotJournal from './components/TarotJournal';
 import TarotEncyclopedia from './components/TarotEncyclopedia';
 import { ReadingHistory } from './types';
-import { Compass, Sun, Orbit, Hash, BookOpen, NotebookPen, Sparkles } from 'lucide-react';
+import { Compass, Sun, Orbit, Hash, Grid3x3, BookOpen, NotebookPen, Sparkles } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 
 // Heavy features bundle large interpretation datasets — load them on demand
 const NatalChart = lazy(() => import('./components/NatalChart'));
 const Numerology = lazy(() => import('./components/Numerology'));
+const TuViChart = lazy(() => import('./components/TuViChart'));
 
-type View = 'Reading' | 'Daily' | 'Chart' | 'Numerology' | 'Journal' | 'Library';
+type View = 'Reading' | 'Daily' | 'Chart' | 'Numerology' | 'TuVi' | 'Journal' | 'Library';
 
 const navItems: { view: View; label: string; icon: typeof Compass }[] = [
   { view: 'Reading', label: 'Trải bài', icon: Compass },
   { view: 'Daily', label: 'Dự báo ngày', icon: Sun },
   { view: 'Chart', label: 'Bản đồ sao', icon: Orbit },
   { view: 'Numerology', label: 'Thần số', icon: Hash },
+  { view: 'TuVi', label: 'Tử vi', icon: Grid3x3 },
   { view: 'Journal', label: 'Nhật ký', icon: NotebookPen },
   { view: 'Library', label: 'Thư viện', icon: BookOpen },
 ];
@@ -179,6 +181,25 @@ export default function App() {
                 </div>
               }>
                 <Numerology />
+              </Suspense>
+            </motion.div>
+          )}
+
+          {currentView === 'TuVi' && (
+            <motion.div
+              key="tuvi"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.4 }}
+            >
+              <Suspense fallback={
+                <div className="flex flex-col items-center justify-center py-32 gap-4">
+                  <Sparkles className="w-8 h-8 text-brand-gold animate-pulse" />
+                  <span className="font-mono text-xs text-brand-gold tracking-widest uppercase">Đang an sao lập lá số...</span>
+                </div>
+              }>
+                <TuViChart />
               </Suspense>
             </motion.div>
           )}
