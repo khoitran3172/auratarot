@@ -5,6 +5,7 @@ import { computeTuViChart } from '../utils/tuvi';
 import { getLocalDateString } from '../utils/date';
 import { TuViChartResult, Palace, StarInstance } from '../data/tuvi/types';
 import { BRIGHTNESS_NAMES, TRANSFORMATION_NAMES } from '../data/tuvi/constants';
+import { buildOverallReading } from '../data/tuvi/analysis';
 
 // Canh giờ → giờ đại diện (để hourChi đúng)
 const HOURS = [
@@ -97,6 +98,8 @@ export default function TuViChart() {
     for (const p of chart.palaces) m[p.branchIndex] = p;
     return m;
   }, [chart]);
+
+  const reading = useMemo(() => (chart ? buildOverallReading(chart) : null), [chart]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -202,6 +205,49 @@ export default function TuViChart() {
               </div>
             </div>
             <p className="text-center font-mono text-[10px] text-on-surface-variant/60">Chạm vào một cung để xem luận đoán chi tiết.</p>
+
+            {/* Tổng luận lá số */}
+            {reading && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.15 }}
+                className="max-w-3xl mx-auto space-y-4 pt-4"
+              >
+                <div className="text-center space-y-1.5">
+                  <span className="font-mono text-xs text-brand-gold tracking-[0.2em] font-semibold uppercase block">Tổng Luận Lá Số</span>
+                  <h3 className="font-serif text-2xl md:text-3xl text-brand-gold font-bold">{reading.headline}</h3>
+                  <p className="font-sans text-xs md:text-sm text-on-surface-variant">{reading.subhead}</p>
+                </div>
+                {reading.sections.map(sec => (
+                  <div key={sec.key} className="glass-card rounded-2xl border border-brand-gold/15 p-5 md:p-6 space-y-3 shadow-lg">
+                    <h4 className="font-serif text-lg md:text-xl text-brand-gold font-semibold flex items-center gap-2">
+                      <span className="text-xl leading-none">{sec.icon}</span>{sec.title}
+                    </h4>
+                    {sec.tags && sec.tags.length > 0 && (
+                      <div className="flex flex-wrap gap-1.5">
+                        {sec.tags.map((t, i) => {
+                          const warn = t.includes('⚠');
+                          return (
+                            <span key={i} className={`text-[11px] font-sans px-2.5 py-1 rounded-full border ${warn ? 'border-red-400/30 bg-red-500/10 text-red-300' : 'border-brand-gold/30 bg-brand-gold/10 text-brand-gold'}`}>
+                              {t.replace(' ⚠', '')}
+                            </span>
+                          );
+                        })}
+                      </div>
+                    )}
+                    <div className="space-y-2.5 text-sm text-on-background font-sans leading-relaxed">
+                      {sec.paragraphs.map((p, i) => (
+                        <p key={i} className="whitespace-pre-line">{p}</p>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+                <p className="text-center font-mono text-[10px] text-on-surface-variant/50 pt-1">
+                  Tàng thư luận đoán mang tính chiêm nghiệm &amp; giải trí — không thay thế quyết định của chính bạn.
+                </p>
+              </motion.div>
+            )}
           </motion.div>
         )}
       </AnimatePresence>
