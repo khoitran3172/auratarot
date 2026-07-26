@@ -10,7 +10,7 @@ import TarotJournal from './components/TarotJournal';
 import TarotEncyclopedia from './components/TarotEncyclopedia';
 import { ReadingHistory } from './types';
 import { Compass, Sun, Orbit, Hash, Grid3x3, BookOpen, NotebookPen, Sparkles } from 'lucide-react';
-import { motion, AnimatePresence } from 'motion/react';
+import { motion } from 'motion/react';
 
 // Heavy features bundle large interpretation datasets — load them on demand
 const NatalChart = lazy(() => import('./components/NatalChart'));
@@ -28,6 +28,15 @@ const navItems: { view: View; label: string; icon: typeof Compass }[] = [
   { view: 'Journal', label: 'Nhật ký', icon: NotebookPen },
   { view: 'Library', label: 'Thư viện', icon: BookOpen },
 ];
+
+function LoadingView({ label }: { label: string }) {
+  return (
+    <div className="flex flex-col items-center justify-center py-32 gap-4">
+      <Sparkles className="w-8 h-8 text-brand-gold animate-pulse" />
+      <span className="font-mono text-xs text-brand-gold tracking-widest uppercase">{label}</span>
+    </div>
+  );
+}
 
 export default function App() {
   const [currentView, setCurrentView] = useState<View>('Reading');
@@ -118,120 +127,49 @@ export default function App() {
         </div>
       </header>
 
-      {/* Main content Router Stage */}
+      {/* Main content Router Stage.
+          KHÔNG bọc AnimatePresence ở tầng router: với các view nặng (lazy + dataset lớn),
+          AnimatePresence mode="wait" bị treo ở view cũ khiến điều hướng chết hẳn.
+          Chỉ cần motion.div có key đổi theo view là đủ hiệu ứng fade khi vào. */}
       <main className="pt-20 min-h-[calc(100vh-4rem)]">
-        <AnimatePresence mode="wait">
-          {currentView === 'Reading' && (
-            <motion.div
-              key="reading"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.4 }}
-            >
-              <ReadingRoom
-                onSaveReading={handleSaveReading}
-              />
-            </motion.div>
-          )}
+        <motion.div
+          key={currentView}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.25 }}
+        >
+            {currentView === 'Reading' && <ReadingRoom onSaveReading={handleSaveReading} />}
 
-          {currentView === 'Daily' && (
-            <motion.div
-              key="daily"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.4 }}
-            >
-              <DailyHoroscope />
-            </motion.div>
-          )}
+            {currentView === 'Daily' && <DailyHoroscope />}
 
-          {currentView === 'Chart' && (
-            <motion.div
-              key="chart"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.4 }}
-            >
-              <Suspense fallback={
-                <div className="flex flex-col items-center justify-center py-32 gap-4">
-                  <Sparkles className="w-8 h-8 text-brand-gold animate-pulse" />
-                  <span className="font-mono text-xs text-brand-gold tracking-widest uppercase">Đang triệu hồi tinh bàn...</span>
-                </div>
-              }>
+            {currentView === 'Chart' && (
+              <Suspense fallback={<LoadingView label="Đang triệu hồi tinh bàn..." />}>
                 <NatalChart />
               </Suspense>
-            </motion.div>
-          )}
+            )}
 
-          {currentView === 'Numerology' && (
-            <motion.div
-              key="numerology"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.4 }}
-            >
-              <Suspense fallback={
-                <div className="flex flex-col items-center justify-center py-32 gap-4">
-                  <Sparkles className="w-8 h-8 text-brand-gold animate-pulse" />
-                  <span className="font-mono text-xs text-brand-gold tracking-widest uppercase">Đang giải mã những con số...</span>
-                </div>
-              }>
+            {currentView === 'Numerology' && (
+              <Suspense fallback={<LoadingView label="Đang giải mã những con số..." />}>
                 <Numerology />
               </Suspense>
-            </motion.div>
-          )}
+            )}
 
-          {currentView === 'TuVi' && (
-            <motion.div
-              key="tuvi"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.4 }}
-            >
-              <Suspense fallback={
-                <div className="flex flex-col items-center justify-center py-32 gap-4">
-                  <Sparkles className="w-8 h-8 text-brand-gold animate-pulse" />
-                  <span className="font-mono text-xs text-brand-gold tracking-widest uppercase">Đang an sao lập lá số...</span>
-                </div>
-              }>
+            {currentView === 'TuVi' && (
+              <Suspense fallback={<LoadingView label="Đang an sao lập lá số..." />}>
                 <TuViChart />
               </Suspense>
-            </motion.div>
-          )}
+            )}
 
-          {currentView === 'Journal' && (
-            <motion.div
-              key="journal"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.4 }}
-            >
+            {currentView === 'Journal' && (
               <TarotJournal
                 historyList={historyList}
                 onUpdateHistory={handleUpdateHistory}
                 onNavigateToDraw={() => navigateTo('Reading')}
               />
-            </motion.div>
-          )}
+            )}
 
-          {currentView === 'Library' && (
-            <motion.div
-              key="library"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.4 }}
-            >
-              <TarotEncyclopedia />
-            </motion.div>
-          )}
-        </AnimatePresence>
+            {currentView === 'Library' && <TarotEncyclopedia />}
+        </motion.div>
       </main>
 
       {/* Fixed Sticky Mobile Bottom Navigation Bar (Visible only on mobile devices) */}

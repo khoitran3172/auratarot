@@ -1,146 +1,209 @@
-import { Palace, StarInstance, Brightness } from './types';
-import { STAR_POLARITY, BRIGHTNESS_NAMES, TRANSFORMATION_NAMES } from './constants';
+// Luận đoán từng cung theo lối 5 TẦNG của người có nghề:
+//   (Chính tinh × Cung) × Độ sáng × Phụ tinh đồng cung × Tam hợp–Xung chiếu × Tứ Hóa
+// Mỗi tầng bồi thêm một lớp nghĩa, thay vì tra bảng phẳng.
 
-// Mảnh A — bản chất cốt lõi từng sao (ghép với lĩnh vực cung)
-const STAR_ESSENCE: Record<string, string> = {
-  // 14 chính tinh
-  TuVi: 'khí chất tôn quý, tài lãnh đạo điều hành và uy tín được người khác nể trọng',
-  ThienCo: 'trí tuệ mưu lược, khéo tính toán, linh hoạt ứng biến và ưa vận động',
-  ThaiDuong: 'nguồn năng lượng dương cương, hào phóng, quang minh, thích cống hiến và toả sáng',
-  VuKhuc: 'ý chí cương nghị, tài quản lý tài chính và tinh thần hành động quả quyết',
-  ThienDong: 'sự an nhiên, phúc hậu, tâm hồn lạc quan biết hưởng thụ và dễ được che chở',
-  LiemTrinh: 'cá tính mạnh, nguyên tắc, đào hoa ngầm và khả năng bứt phá cải cách',
-  ThienPhu: 'sự vững chãi, tài tích luỹ, bao dung điềm đạm và biết giữ của cải',
-  ThaiAm: 'sự dịu dàng, tinh tế, giàu trực giác, óc thẩm mỹ và khả năng tích trữ âm thầm',
-  ThamLang: 'sức hút mạnh mẽ, đa tài đa dục, tham vọng và khát khao trải nghiệm',
-  CuMon: 'tài ăn nói hùng biện, óc phản biện sắc bén nhưng dễ vướng thị phi khẩu thiệt',
-  ThienTuong: 'sự tận tụy, trung hậu, biết phò tá và ưa cái đẹp mực thước',
-  ThienLuong: 'phẩm cách chính trực, giàu lòng nhân, khả năng che chở và hoá giải tai ương',
-  ThatSat: 'khí phách uy dũng, quyết đoán, dám xông pha nhưng cô độc và khắc nghiệt',
-  PhaQuan: 'tinh thần phá cách, dám đạp đổ làm lại, mạnh mẽ nhưng dễ hao tổn biến động',
-  // Phụ cát
-  TaPhu: 'quý nhân phò tá đắc lực, người trợ giúp âm thầm phía sau',
-  HuuBat: 'sự hậu thuẫn, giúp đỡ từ người xung quanh một cách bền bỉ',
-  VanXuong: 'tài văn chương, học vấn khoa bảng và tư duy mạch lạc',
-  VanKhuc: 'tài hoa nghệ thuật, khẩu tài và cảm xúc tinh tế',
-  ThienKhoi: 'quý nhân bậc trên nâng đỡ công khai, cơ may đến từ người có địa vị',
-  ThienViet: 'quý nhân kín đáo giúp đỡ, cơ hội bất ngờ và sự khéo léo',
-  LocTon: 'tài lộc, sự sung túc và khả năng giữ gìn của cải',
-  // Phụ sát
-  KinhDuong: 'sự sắc bén cương mãnh nhưng dễ gây tranh đấu, thương tổn',
-  DaLa: 'sự trì trệ, dây dưa và những phiền toái ngấm ngầm kéo dài',
-  HoaTinh: 'tính nóng nảy bộc phát và những biến động đột ngột',
-  LinhTinh: 'nỗi uất kết ngấm ngầm và tai ương khó lường',
-  DiaKhong: 'sự trống rỗng, hao hụt và những ý tưởng viển vông',
-  DiaKiep: 'sự phá tán, hao tổn và trắc trở nửa chừng',
-  // Đào hoa
-  DaoHoa: 'sức hút giới tính mạnh mẽ, duyên tình nồng nàn và sự lôi cuốn tức thì',
-  HongLoan: 'nhan sắc duyên dáng, chuyện hỷ sự cưới hỏi và tình cảm lãng mạn',
-  ThienHy: 'tin vui, hỷ sự, niềm vui con cái và không khí hân hoan',
-  ThienDieu: 'nét phong lưu đa tình, hài hước có duyên nhưng dễ sa đà tình cảm',
-};
+import { Palace, StarInstance, TuViChartResult, Brightness } from './types';
+import {
+  BRIGHTNESS_NAMES, TRANSFORMATION_NAMES, PALACE_DOMAIN, CHINH_TINH, STAR_DEFS,
+} from './constants';
+import { ALL_STAR_MEANINGS as STAR_MEANINGS } from './starMeaningsAll';
+import { CHINH_TINH_PALACE_A } from './chinhTinhPalaceA';
+import { CHINH_TINH_PALACE_B } from './chinhTinhPalaceB';
 
-// Mảnh B — lĩnh vực đời sống của 12 cung
-const PALACE_DOMAIN: Record<string, string> = {
-  'Mệnh': 'bản thân, tính cách cốt lõi và vận mệnh tổng quát của bạn',
-  'Phụ Mẫu': 'cha mẹ, bề trên, cấp trên và những người đỡ đầu bạn',
-  'Phúc Đức': 'phúc phần, đời sống tinh thần, hưởng thụ và may mắn thừa hưởng',
-  'Điền Trạch': 'nhà cửa, đất đai, tài sản cố định và gia trạch',
-  'Quan Lộc': 'sự nghiệp, công danh và con đường thăng tiến',
-  'Nô Bộc': 'bạn bè, cộng sự, người dưới quyền và các mối quan hệ xã hội',
-  'Thiên Di': 'sự dịch chuyển, ra ngoài xã hội, cơ hội xa nhà và quý nhân bên ngoài',
-  'Tật Ách': 'sức khỏe, bệnh tật và những tai ách trong đời',
-  'Tài Bạch': 'tiền bạc, khả năng kiếm và giữ tiền',
-  'Tử Tức': 'con cái, sức sáng tạo và thế hệ sau',
-  'Phu Thê': 'hôn nhân, tình duyên và người bạn đời',
-  'Huynh Đệ': 'anh chị em, bạn bè thân và những người đồng hành gần gũi',
-};
+const CHINH_TINH_PALACE = { ...CHINH_TINH_PALACE_A, ...CHINH_TINH_PALACE_B };
 
-// Rút gọn lĩnh vực để ghép câu phụ
-const PALACE_SHORT: Record<string, string> = {
-  'Mệnh': 'bản thân', 'Phụ Mẫu': 'cha mẹ & bề trên', 'Phúc Đức': 'phúc phần',
-  'Điền Trạch': 'nhà cửa đất đai', 'Quan Lộc': 'sự nghiệp', 'Nô Bộc': 'bạn bè cộng sự',
-  'Thiên Di': 'việc ra ngoài xã hội', 'Tật Ách': 'sức khỏe', 'Tài Bạch': 'tiền bạc',
-  'Tử Tức': 'con cái', 'Phu Thê': 'hôn nhân tình duyên', 'Huynh Đệ': 'anh em bạn bè',
-};
+const mod12 = (x: number) => ((x % 12) + 12) % 12;
 
-// Mảnh C — sắc thái theo độ sáng, phân theo sao tốt (N≥0) hay xấu (N<0)
-function brightnessShade(brightness: Brightness, polarity: number): string {
-  const good = polarity >= 0;
-  switch (brightness) {
-    case 'M':
-    case 'V':
-      return good
-        ? 'phát huy rực rỡ, mang lại nhiều thuận lợi:'
-        : 'tuy là hung tinh nhưng đắc thế nên được chế hoá thành uy lực, quyết đoán có ích:';
-    case 'D':
-      return good ? 'phát huy khá tốt:' : 'hung tính đã dịu bớt, còn giữ được nét cứng cỏi:';
-    case 'B':
-      return good ? 'ở mức trung hoà, không quá nổi bật:' : 'bắt đầu lộ nét bất ổn cần lưu tâm:';
-    case 'H':
-    default:
-      return good
-        ? 'bị hãm nên khó phát huy, hiệu lực suy giảm:'
-        : 'bị hãm địa nên hung tính dễ bùng phát, cần đặc biệt thận trọng:';
-  }
+/** Sao sáng (M/V/Đ) dùng bản luận "bright", mờ (B/H) dùng "dim" */
+function isBright(b?: Brightness): boolean {
+  return b === 'M' || b === 'V' || b === 'D';
 }
 
-function starLabel(st: StarInstance): string {
-  let label = st.name;
-  if (st.kind === 'chinh_tinh' && st.brightness) {
-    label += ` (${BRIGHTNESS_NAMES[st.brightness]})`;
-  }
-  if (st.transformation) {
-    label += ` ${TRANSFORMATION_NAMES[st.transformation]}`;
-  }
-  return label;
+export function starLabel(s: StarInstance): string {
+  let l = s.name;
+  if (s.brightness) l += ` (${BRIGHTNESS_NAMES[s.brightness]})`;
+  if (s.transformation) l += ` ${TRANSFORMATION_NAMES[s.transformation]}`;
+  return l;
+}
+
+function joinVi(items: string[]): string {
+  if (items.length === 0) return '';
+  if (items.length === 1) return items[0];
+  return items.slice(0, -1).join(', ') + ' và ' + items[items.length - 1];
+}
+
+function chinhOf(p: Palace): StarInstance[] {
+  return p.stars.filter(s => s.kind === 'chinh_tinh');
+}
+
+function listChinh(p: Palace): string {
+  const c = chinhOf(p);
+  return c.length ? c.map(starLabel).join(' – ') : 'vô chính diệu';
 }
 
 /**
- * Sinh câu luận đoán cho một cung bằng cách ghép mảnh:
- * (bản chất sao) × (lĩnh vực cung) × (sắc thái độ sáng).
+ * Sinh chuỗi luận đoán cho một cung, dùng toàn cảnh lá số để xét tam hợp/xung chiếu.
  */
-export function buildInterpretations(palace: Palace): string[] {
+export function buildPalaceInterpretations(palace: Palace, chart: TuViChartResult): string[] {
   const out: string[] = [];
-  const domain = PALACE_DOMAIN[palace.name];
-  const short = PALACE_SHORT[palace.name];
+  const domain = PALACE_DOMAIN[palace.name] || 'lĩnh vực này';
+  const chinh = chinhOf(palace);
 
-  const chinh = palace.stars.filter(s => s.kind === 'chinh_tinh');
-  const others = palace.stars.filter(s => s.kind !== 'chinh_tinh');
+  const opposite = chart.palaces.find(p => p.branchIndex === mod12(palace.branchIndex + 6));
+  const trines = chart.palaces.filter(p =>
+    [mod12(palace.branchIndex + 4), mod12(palace.branchIndex + 8)].includes(p.branchIndex)
+  );
 
-  // Câu chủ đạo từ chính tinh
+  // ══ Mở đầu: định vị cung ══
+  out.push(
+    `Cung ${palace.name} an tại ${palace.canName} ${palace.branchName}, tọa thủ ${listChinh(palace)}` +
+    `${palace.isBody ? ', đồng thời là nơi cung Thân an cư' : ''}. Cung này cai quản ${domain}.`
+  );
+
+  // ══ TẦNG 1 + 2: Chính tinh × Cung × Độ sáng ══
   if (chinh.length > 0) {
     for (const st of chinh) {
-      const N = STAR_POLARITY[st.id] ?? 0;
-      const shade = brightnessShade(st.brightness as Brightness, N);
-      const essence = STAR_ESSENCE[st.id] || 'năng lượng riêng của mình';
-      out.push(`${starLabel(st)} tọa cung ${palace.name} — ${shade} ${essence}, in dấu rõ lên ${domain}.`);
+      const reading = CHINH_TINH_PALACE[st.id]?.[palace.name];
+      if (!reading) continue;
+      const bright = isBright(st.brightness);
+      const body = bright ? reading.bright : reading.dim;
+      const sang = st.brightness ? BRIGHTNESS_NAMES[st.brightness] : '';
+      out.push(
+        `${st.name}${sang ? ` ${sang.toLowerCase()} địa` : ''} tại đây — ${body} ✦ ${reading.advice}`
+      );
     }
   } else {
-    out.push(`Cung ${palace.name} vô chính diệu (không có chính tinh) — ${domain} chịu ảnh hưởng chủ yếu từ các sao phụ và cung xung chiếu; tính cách ở phương diện này mềm dẻo, dễ thích nghi theo hoàn cảnh.`);
+    // Vô chính diệu: mượn khí đối cung
+    const oppChinh = opposite ? chinhOf(opposite) : [];
+    out.push(
+      `Cung này vô chính diệu — không có chính tinh tọa thủ nên phải mượn khí của ${
+        oppChinh.length ? oppChinh.map(starLabel).join(' – ') : 'cung xung chiếu'
+      } từ cung ${opposite?.name ?? 'đối diện'}. Người xưa nói cung vô chính diệu thì "khí mờ mà uyển chuyển": ${domain} của bạn không có nét định hình cứng, dễ thay đổi theo hoàn cảnh và người xung quanh; nếu được cát tinh hội chiếu lại thành "phản vi kỳ cách", hậu vận tốt hơn tiền vận.`
+    );
+    if (oppChinh.length) {
+      const st = oppChinh[0];
+      const reading = CHINH_TINH_PALACE[st.id]?.[palace.name];
+      if (reading) {
+        out.push(`Khí mượn về mang sắc ${st.name}: ${isBright(st.brightness) ? reading.bright : reading.dim}`);
+      }
+    }
   }
 
-  // Câu phụ cho phụ tinh / đào hoa / Tứ Hóa đáng chú ý
-  for (const st of others) {
-    const essence = STAR_ESSENCE[st.id];
-    if (!essence) continue;
-    let extra = '';
-    if (st.transformation === 'ky') extra = ' — song có Hóa Kỵ nên dễ vướng trắc trở, cần hoá giải bằng sự kiên nhẫn';
-    else if (st.transformation) extra = ` — lại được ${TRANSFORMATION_NAMES[st.transformation]} nâng đỡ nên càng thêm tốt đẹp`;
-    out.push(`Có ${starLabel(st)}: ${essence}, tác động tới ${short}${extra}.`);
+  // ══ TẦNG 3: Phụ tinh đồng cung ══
+  const catStars = palace.stars.filter(s => s.kind === 'phu_tinh' && s.nature === 'cat');
+  const satStars = palace.stars.filter(s => s.kind === 'phu_tinh' && s.nature === 'hung');
+  const daoStars = palace.stars.filter(s => s.kind === 'dao_hoa');
+
+  const describe = (list: StarInstance[], max: number): string =>
+    joinVi(list.slice(0, max).map(s => {
+      const m = STAR_MEANINGS[s.id];
+      return m ? `${s.name} — ${m.essence}` : s.name;
+    }));
+
+  if (catStars.length) {
+    const rest = catStars.length > 3 ? `; ngoài ra còn ${joinVi(catStars.slice(3).map(s => s.name))}` : '';
+    out.push(
+      `Cát tinh phù trợ tại cung: ${describe(catStars, 3)}${rest}. Những sao này nâng đỡ ${domain}, làm dịu phần khắc nghiệt và mở thêm cơ hội.`
+    );
+    // Ghi chú đáng lưu ý của sao mạnh nhất
+    const strongest = catStars.reduce((a, s) =>
+      (STAR_DEFS[s.id]?.weight ?? 0) > (STAR_DEFS[a.id]?.weight ?? 0) ? s : a, catStars[0]);
+    const note = STAR_MEANINGS[strongest.id]?.note;
+    if (note) out.push(note);
   }
 
-  // Tuần / Triệt
-  if (palace.hasTriet && palace.hasTuan) {
-    out.push('Cung bị cả Tuần lẫn Triệt án ngữ — mọi việc (cả tốt lẫn xấu) đều bị giảm cường độ và thường đến chậm, cần bền chí.');
+  if (satStars.length) {
+    const rest = satStars.length > 3 ? `; cùng với ${joinVi(satStars.slice(3).map(s => s.name))}` : '';
+    out.push(
+      `Sát tinh cần đề phòng: ${describe(satStars, 3)}${rest}. Đây là những nút thắt của ${domain} — không phải điềm gở mà là chỗ đời gửi bài học; biết trước thì hóa giải được phần lớn.`
+    );
+    const note = STAR_MEANINGS[satStars[0].id]?.note;
+    if (note) out.push(note);
+  }
+
+  if (daoStars.length) {
+    out.push(
+      `Có đào hoa tinh ${joinVi(daoStars.map(s => s.name))} đóng tại đây — sắc thái tình cảm, sức hút và duyên gặp gỡ in dấu lên ${domain}. ${
+        daoStars.some(s => s.id === 'DaoHoa') && daoStars.some(s => s.id === 'HongLoan')
+          ? 'Đào Hoa hội Hồng Loan là bộ Tam Minh, càng thêm phần duyên dáng và hỷ sự.'
+          : 'Cần giữ chừng mực để duyên thành phúc, không thành họa.'
+      }`
+    );
+  }
+
+  // ══ TẦNG 4: Tứ Hóa ══
+  const hoaStars = palace.stars.filter(s => s.transformation);
+  for (const st of hoaStars) {
+    const t = st.transformation!;
+    if (t === 'ky') {
+      out.push(
+        `${st.name} Hóa Kỵ đóng tại cung này — Hóa Kỵ vào cung nào thì cung ấy là "tử huyệt" của lá số: ${domain} dễ vướng mắc, trì trệ, hoặc trở thành nơi bạn chấp niệm nhiều nhất. Người xưa dạy lấy sự nhẫn nại và buông bỏ đúng lúc làm thuốc giải.`
+      );
+    } else {
+      const effect = t === 'loc' ? 'tài lộc và nhân duyên thuận lợi'
+        : t === 'quyen' ? 'quyền lực, khả năng chưởng quản và sự quyết đoán'
+        : 'danh tiếng, học vấn và quý nhân nâng đỡ';
+      out.push(
+        `${st.name} được ${TRANSFORMATION_NAMES[t]} kích hoạt — thêm ${effect} cho ${domain}. Đây là điểm nên dồn sức khai thác, vì Tứ Hóa là chỗ vận khí "bật đèn xanh" theo can năm sinh của bạn.`
+      );
+    }
+  }
+
+  // ══ TẦNG 5: Tam hợp & Xung chiếu ══
+  if (opposite) {
+    out.push(
+      `Xung chiếu: cung ${opposite.name} (${listChinh(opposite)}) đối diện chiếu sang. Trong tử vi, đối cung có lực gần ngang cung tọa thủ — nên ${domain} của bạn luôn bị kéo bởi lực của ${opposite.name}; hai cung này phải đọc cùng nhau mới thấy đủ.`
+    );
+  }
+  if (trines.length) {
+    out.push(
+      `Tam hợp chiếu về: ${trines.map(p => `${p.name} (${listChinh(p)})`).join(' và ')}. Cùng với cung xung chiếu, bốn cung này tạo thành "tam phương tứ chính" — bộ khung quyết định thực lực của ${domain}.`
+    );
+  }
+
+  // ══ Tuần / Triệt ══
+  if (palace.hasTuan && palace.hasTriet) {
+    out.push('Cung bị cả Tuần lẫn Triệt án ngữ — mọi việc, dù tốt hay xấu, đều bị giảm cường độ và thường đến muộn hơn mong đợi. Bù lại, hung khí cũng bị chặn bớt; đây là cung cần "chậm mà chắc".');
   } else if (palace.hasTriet) {
-    out.push('Cung có Triệt án ngữ — việc tốt đến chậm ở nửa đầu đời, nhưng cũng giúp chặn bớt điều xấu; hãy kiên trì.');
+    out.push('Có Triệt Lộ Không Vong án ngữ — Triệt chặn mạnh nhưng chủ yếu ở khoảng ba mươi năm đầu đời; sau đó lực giảm dần. Việc tốt đến chậm, việc xấu cũng bị chặn lại.');
   } else if (palace.hasTuan) {
-    out.push('Cung có Tuần án ngữ — năng lượng bị ngăn trở nhẹ và đều, thành quả thường tới muộn hơn mong đợi.');
+    out.push('Có Tuần Trung Không Vong án ngữ — Tuần ngăn trở nhẹ nhưng đều đặn suốt đời và mạnh hơn ở nửa sau. Thành quả thường tới muộn, cần bền chí.');
   }
 
-  // Kết bằng đánh giá tổng thể
-  out.push(`Tổng thể cung ${palace.name}: ${palace.score.label} (${palace.score.score100}/100 — ${'⭐'.repeat(palace.score.stars5) || 'không sao'}).`);
+  // ══ Vòng Trường Sinh — nhịp sinh trưởng của cung ══
+  const ts = palace.stars.find(s => s.kind === 'vong_truong_sinh');
+  if (ts) {
+    const m = STAR_MEANINGS[ts.id];
+    out.push(
+      `Vòng Trường Sinh tại đây là sao ${ts.name}${m ? ` — chủ về ${m.essence}` : ''}. Sao vòng này cho biết ${domain} đang ở chặng nào của nhịp sinh–trưởng–suy–tử.`
+    );
+  }
+
+  // ══ Vòng Thái Tuế / Bác Sĩ — chỉ nêu sao đáng chú ý ══
+  const notable = palace.stars.filter(s =>
+    (s.kind === 'vong_thai_tue' || s.kind === 'vong_bac_si') && s.nature !== 'trung'
+  );
+  if (notable.length) {
+    const good = notable.filter(s => s.nature === 'cat').map(s => s.name);
+    const bad = notable.filter(s => s.nature === 'hung').map(s => s.name);
+    const parts: string[] = [];
+    if (good.length) parts.push(`sao lành ${joinVi(good)}`);
+    if (bad.length) parts.push(`sao ngại ${joinVi(bad)}`);
+    out.push(`Các vòng sao lưu niên tại cung: ${parts.join('; ')}. Nhóm này ảnh hưởng rõ nhất khi vận hạn đi tới cung này.`);
+  }
+
+  // ══ Thời gian: đại hạn & tiểu hạn ══
+  const nearMinor = palace.minorAges.filter(a => a >= chart.currentAge && a <= chart.currentAge + 12);
+  out.push(
+    `Nhịp thời gian: đại hạn của cung này trải từ ${palace.majorPeriod.fromAge} đến ${palace.majorPeriod.toAge} tuổi` +
+    (nearMinor.length ? `; tiểu hạn sắp tới rơi vào tuổi ${nearMinor.slice(0, 2).join(' và ')}.` : '.') +
+    ` Khi vận đi qua đây, những gì luận ở trên sẽ hiện rõ nhất.`
+  );
+
+  // ══ Kết: điểm số ══
+  out.push(
+    `Tổng thể cung ${palace.name}: ${palace.score.label} — ${palace.score.score100}/100 ${'★'.repeat(palace.score.stars5) || '(không sao)'}.`
+  );
 
   return out;
 }
