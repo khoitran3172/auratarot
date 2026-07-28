@@ -5,6 +5,11 @@ import { TarotCard, ChatMessage, ReadingHistory } from '../types';
 import { Sparkles, Brain, ArrowRight, RefreshCw, Layers, Check, Send, AlertCircle, HelpCircle } from 'lucide-react';
 import Markdown from 'react-markdown';
 import { motion, AnimatePresence } from 'motion/react';
+import { ShuffleDeck } from './tarot/ShuffleDeck';
+import { CardFan } from './tarot/CardFan';
+import { FlipCard } from './tarot/FlipCard';
+import { FocusOverlay } from './tarot/FocusOverlay';
+import { DURATION } from '../motion/anim';
 
 interface ReadingRoomProps {
   onSaveReading: (reading: ReadingHistory) => void;
@@ -14,6 +19,12 @@ const CARD_BACK_URL = "https://lh3.googleusercontent.com/aida-public/AB6AXuDEksT
 
 // Number of face-down cards shown in the pick fan
 const FAN_SIZE = 52;
+
+/** Card artwork, unchanged — the motion components take these as-is so the
+ *  cards look exactly as they did before. */
+const CardBackArt = ({ className = 'w-full h-full object-cover rounded-lg' }: { className?: string }) => (
+  <img src={CARD_BACK_URL} alt="" referrerPolicy="no-referrer" className={className} />
+);
 
 const aspects = [
   { id: 'Tình yêu', label: 'Tình yêu' },
@@ -244,7 +255,8 @@ export default function ReadingRoom({ onSaveReading }: ReadingRoomProps) {
   const [flipped, setFlipped] = useState<boolean[]>([]);
   // Fan indices the user has picked, in pick order — slot i shows the card picked i-th
   const [pickedFan, setPickedFan] = useState<number[]>([]);
-  const [shufflingCount, setShufflingCount] = useState(0);
+  // Index of the card currently pulled into the focus overlay, or null.
+  const [focusedCard, setFocusedCard] = useState<number | null>(null);
   const [remainingSlots, setRemainingSlots] = useState<number>(3);
   const [isResonantSession, setIsResonantSession] = useState(false);
   
@@ -303,16 +315,8 @@ export default function ReadingRoom({ onSaveReading }: ReadingRoomProps) {
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [chatHistory, isFollowUpLoading]);
 
-  // Handle Shuffling Effect loop
-  useEffect(() => {
-    let interval: NodeJS.Timeout;
-    if (step === 'shuffle') {
-      interval = setInterval(() => {
-        setShufflingCount((c) => c + 1);
-      }, 150);
-    }
-    return () => clearInterval(interval);
-  }, [step]);
+  // The shuffle animation is self-driving inside ShuffleDeck now; it no longer
+  // needs a 150ms interval ticking React state to move the cards.
 
   // Aspect helper
   const selectAspect = (asp: string) => {
@@ -465,6 +469,26 @@ export default function ReadingRoom({ onSaveReading }: ReadingRoomProps) {
     return celticLabels[idx] || `Vị trí thứ ${idx + 1}`;
   };
 
+  // The two card faces, lifted out verbatim so FlipCard and FocusOverlay render
+  // identical artwork. Nothing here changed from the original inline markup.
+  const cardBackFace = () => (
+    <div className="w-full h-full rounded-xl glass-card border border-brand-gold/40 p-1 shadow-[0_0_20px_rgba(233,195,73,0.15)]">
+      <CardBackArt />
+    </div>
+  );
+
+  const cardFrontFace = (card: TarotCard, idx: number) => (
+    <div className="w-full h-full rounded-xl bg-surface-3 border border-brand-gold/45 p-1 shadow-glow flex flex-col items-center justify-between">
+      <img src={card.image} alt={card.name} referrerPolicy="no-referrer" className="w-full h-[72%] object-cover rounded-lg" />
+      <div className="pb-1 w-full text-center font-sans">
+        <h4 className="font-serif text-ink-strong text-[10px] md:text-xs font-bold truncate px-1">{card.name}</h4>
+        <span className="font-mono text-[8px] text-brand-gold block leading-none">
+          {orientations[idx] === 'reversed' ? 'Ngược (Rev)' : 'Xuôi (Upr)'}
+        </span>
+      </div>
+    </div>
+  );
+
   // Invoke local offline high-vibe tarot interpreter
   const requestAiTarotReading = async () => {
     setIsAiLoading(true);
@@ -615,7 +639,7 @@ export default function ReadingRoom({ onSaveReading }: ReadingRoomProps) {
                       className={`px-5 py-2.5 rounded-full border text-xs font-mono tracking-wider transition-all duration-300 ${
                         aspect === asp.id
                           ? 'border-brand-gold text-brand-gold bg-brand-gold/10 font-bold shadow-[0_0_15px_rgba(233,195,73,0.15)] scale-105'
-                          : 'border-outline/20 text-on-surface-variant hover:border-brand-cyan hover:text-brand-cyan'
+                          : 'border-line text-on-surface-variant hover:border-brand-cyan hover:text-brand-cyan'
                       }`}
                     >
                       {asp.label}
@@ -637,11 +661,11 @@ export default function ReadingRoom({ onSaveReading }: ReadingRoomProps) {
                     className={`text-left cursor-pointer p-4 rounded-2xl border transition-all duration-300 flex flex-col justify-between h-36 relative ${
                       spreadType === '1-card'
                         ? 'border-brand-gold bg-brand-gold/5 shadow-[0_0_15px_rgba(233,195,73,0.1)]'
-                        : 'border-outline/20 hover:border-brand-cyan hover:bg-white/5 bg-transparent'
+                        : 'border-line hover:border-brand-cyan hover:bg-ink-strong/5 bg-transparent'
                     }`}
                   >
                     <div className="flex justify-between items-start w-full mb-1">
-                      <span className="font-serif text-base font-bold text-white">Trải bài 1 Lá</span>
+                      <span className="font-serif text-base font-bold text-ink-strong">Trải bài 1 Lá</span>
                       <span className="font-mono text-[9px] bg-brand-gold/10 text-brand-gold px-1.5 py-0.5 rounded border border-brand-gold/15 shrink-0">1 Lá</span>
                     </div>
                     <p className="font-sans text-xs text-on-surface-variant leading-relaxed line-clamp-3">
@@ -656,11 +680,11 @@ export default function ReadingRoom({ onSaveReading }: ReadingRoomProps) {
                     className={`text-left cursor-pointer p-4 rounded-2xl border transition-all duration-300 flex flex-col justify-between h-36 relative ${
                       spreadType === '3-cards'
                         ? 'border-brand-gold bg-brand-gold/5 shadow-[0_0_15px_rgba(233,195,73,0.1)]'
-                        : 'border-outline/20 hover:border-brand-cyan hover:bg-white/5 bg-transparent'
+                        : 'border-line hover:border-brand-cyan hover:bg-ink-strong/5 bg-transparent'
                     }`}
                   >
                     <div className="flex justify-between items-start w-full mb-1">
-                      <span className="font-serif text-base font-bold text-white">Trải bài 3 Lá</span>
+                      <span className="font-serif text-base font-bold text-ink-strong">Trải bài 3 Lá</span>
                       <span className="font-mono text-[9px] bg-brand-cyan/10 text-brand-cyan px-1.5 py-0.5 rounded border border-brand-cyan/15 shrink-0">3 Lá</span>
                     </div>
                     <p className="font-sans text-xs text-on-surface-variant leading-relaxed line-clamp-3">
@@ -675,12 +699,12 @@ export default function ReadingRoom({ onSaveReading }: ReadingRoomProps) {
                     className={`text-left cursor-pointer p-4 rounded-2xl border transition-all duration-300 flex flex-col justify-between h-36 relative ${
                       spreadType === '10-cards'
                         ? 'border-brand-gold bg-brand-gold/5 shadow-[0_0_15px_rgba(233,195,73,0.1)]'
-                        : 'border-outline/20 hover:border-brand-cyan hover:bg-white/5 bg-transparent'
+                        : 'border-line hover:border-brand-cyan hover:bg-ink-strong/5 bg-transparent'
                     }`}
                   >
                     <div className="flex justify-between items-start w-full mb-1">
-                      <span className="font-serif text-base font-bold text-white">Celtic Cross</span>
-                      <span className="font-mono text-[9px] bg-purple-500/15 text-purple-400 px-1.5 py-0.5 rounded border border-purple-500/15 shrink-0">10 Lá</span>
+                      <span className="font-serif text-base font-bold text-ink-strong">Celtic Cross</span>
+                      <span className="font-mono text-[9px] bg-accent-2/15 text-accent-2 px-1.5 py-0.5 rounded border border-accent-2/15 shrink-0">10 Lá</span>
                     </div>
                     <p className="font-sans text-xs text-on-surface-variant leading-relaxed line-clamp-3">
                       Thập tự Celtic - Sơ đồ uy quyền giải đoán 10 phương diện cuộc đời: tâm thế, thử thách, ý thức, lo sợ và kết quả tối hậu.
@@ -690,8 +714,8 @@ export default function ReadingRoom({ onSaveReading }: ReadingRoomProps) {
               </div>
 
               {errorText && (
-                <div className="p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-xs text-red-400 font-sans flex items-center gap-2">
-                  <AlertCircle className="w-4.5 h-4.5 text-red-400 shrink-0" />
+                <div className="p-3 rounded-xl bg-danger/10 border border-danger/20 text-xs text-danger font-sans flex items-center gap-2">
+                  <AlertCircle className="w-4.5 h-4.5 text-danger shrink-0" />
                   <span>{errorText}</span>
                 </div>
               )}
@@ -735,7 +759,7 @@ export default function ReadingRoom({ onSaveReading }: ReadingRoomProps) {
               <span className="font-mono text-xs text-brand-cyan tracking-widest font-semibold block">
                 NĂNG LƯỢNG ĐANG KẾT NỐI
               </span>
-              <h2 className="font-serif text-3xl md:text-4xl text-white font-bold">
+              <h2 className="font-serif text-3xl md:text-4xl text-ink-strong font-bold">
                 Xóc &amp; Thanh tẩy bộ bài
               </h2>
               <p className="font-sans text-sm text-on-surface-variant max-w-sm mx-auto">
@@ -743,32 +767,16 @@ export default function ReadingRoom({ onSaveReading }: ReadingRoomProps) {
               </p>
             </div>
 
-            {/* Simulated interactive Card shuffle block */}
-            <div className="relative h-64 flex items-center justify-center overflow-visible py-12">
-              <div className="absolute inset-0 bg-radial-gradient from-brand-gold/5 via-transparent to-transparent blur-3xl pointer-events-none"></div>
-              
-              {/* Overlapping Shuffling cards */}
-              {[0, 1, 2, 3, 4].map((i) => {
-                const rotation = Math.sin(shufflingCount + i) * 15;
-                const offset = Math.cos(shufflingCount + i) * 40;
-                return (
-                  <motion.div
-                    key={i}
-                    animate={{ rotate: rotation, x: offset, y: i * -4 }}
-                    transition={{ ease: 'easeInOut', duration: 0.15 }}
-                    className="absolute w-36 h-60 rounded-xl border border-brand-gold/25 bg-brand-purple/40 shadow-xl p-1 overflow-hidden pointer-events-none"
-                    style={{ zIndex: 10 + i }}
-                  >
-                    <img
-                      src="https://lh3.googleusercontent.com/aida-public/AB6AXuDEksTacBFqLO079ouUC5XRH2G8JfCNH4ZhLCcrJL6joiyeHhvoPZg2vJ0beTv6Tnp1hQZbdd94T8FLa2PJaJxl_V4Yx0FSbi1xat6Ku2XUdMEhPU5mr-j4xk81Sz2il94koBoIK98fYrBDe9E3Rjm7Pykln3OiHSFPquKEhwCd1P1L6bcQifSupbL3zJrB8FVWZ7JP9GKz7lxQwx2sfX1FJIeKcfyhD9rySUFG4CvZKIp9nZ5o38TE05Y1Z8BaC2jon60oF9uxLvk"
-                      alt="Shuffling card back"
-                      referrerPolicy="no-referrer"
-                      className="w-full h-full object-cover rounded-lg opacity-80"
-                    />
-                  </motion.div>
-                );
-              })}
-            </div>
+            {/* Riffle shuffle */}
+            <ShuffleDeck
+              className="relative h-72 py-12"
+              count={16}
+              back={
+                <div className="w-full h-full rounded-xl border border-brand-gold/25 bg-brand-purple/40 shadow-xl p-1 overflow-hidden pointer-events-none">
+                  <CardBackArt className="w-full h-full object-cover rounded-lg opacity-80" />
+                </div>
+              }
+            />
 
             <button
               onClick={stopShufflingAndSpread}
@@ -801,7 +809,7 @@ export default function ReadingRoom({ onSaveReading }: ReadingRoomProps) {
               </p>
               {isResonantSession && (
                 <div className="max-w-md mx-auto px-4 py-2.5 rounded-full border border-brand-gold/30 bg-brand-gold/5 flex items-center justify-center gap-2 mt-4 shadow-[0_0_15px_rgba(233,195,73,0.06)] animate-pulse">
-                  <span className="inline-block w-2 h-2 rounded-full bg-brand-gold shadow-[0_0_6px_#c5a059]"></span>
+                  <span className="inline-block w-2 h-2 rounded-full bg-brand-gold shadow-[0_0_6px_var(--t-accent)]"></span>
                   <span className="font-mono text-[10px] text-brand-gold tracking-widest uppercase font-semibold">✨ Đã kích hoạt cộng hưởng tâm linh (Trùng tần số cũ)</span>
                 </div>
               )}
@@ -818,7 +826,7 @@ export default function ReadingRoom({ onSaveReading }: ReadingRoomProps) {
                     <span className="font-mono text-[9px] md:text-[10px] text-brand-gold tracking-wider truncate max-w-full text-center block bg-brand-void/80 border border-brand-gold/15 py-1 px-2 rounded">
                       {getPositionLabel(idx)}
                     </span>
-                    <div className={`${drawnCards.length === 10 ? 'w-20 h-32 md:w-24 md:h-40' : 'w-24 h-40 md:w-36 md:h-60'} perspective-1000`}>
+                    <div className={`${drawnCards.length === 10 ? 'w-20 h-32 md:w-24 md:h-40' : 'w-24 h-40 md:w-36 md:h-60'}`}>
                       {isFilled ? (
                         <motion.div
                           initial={{ y: 180, scale: 0.5, opacity: 0, rotate: -8 }}
@@ -826,22 +834,15 @@ export default function ReadingRoom({ onSaveReading }: ReadingRoomProps) {
                           transition={{ type: 'spring', stiffness: 240, damping: 22 }}
                           className="w-full h-full"
                         >
-                          <div className={`card-inner relative w-full h-full text-center transition-transform duration-700 transform-style-3d ${flipped[idx] ? 'rotate-y-180' : ''}`}>
-                            {/* Back */}
-                            <div className="absolute inset-0 backface-hidden rounded-xl glass-card border border-brand-gold/40 p-1 shadow-[0_0_20px_rgba(233,195,73,0.15)]">
-                              <img src={CARD_BACK_URL} alt="Card back" referrerPolicy="no-referrer" className="w-full h-full object-cover rounded-lg" />
-                            </div>
-                            {/* Front */}
-                            <div className="absolute inset-0 backface-hidden rotate-y-180 rounded-xl bg-[#09091d] border border-brand-gold/45 p-1 shadow-[0_0_25px_rgba(197,160,89,0.2)] flex flex-col items-center justify-between">
-                              <img src={card.image} alt={card.name} referrerPolicy="no-referrer" className="w-full h-[72%] object-cover rounded-lg" />
-                              <div className="pb-1 w-full text-center font-sans">
-                                <h4 className="font-serif text-white text-[10px] md:text-xs font-bold truncate px-1">{card.name}</h4>
-                                <span className="font-mono text-[8px] text-brand-gold block leading-none">
-                                  {orientations[idx] === 'reversed' ? 'Ngược (Rev)' : 'Xuôi (Upr)'}
-                                </span>
-                              </div>
-                            </div>
-                          </div>
+                          <FlipCard
+                            className="w-full h-full"
+                            flipped={Boolean(flipped[idx])}
+                            layoutId={`reading-card-${idx}`}
+                            label={flipped[idx] ? `Xem lá ${card.name} toàn cảnh` : undefined}
+                            onActivate={flipped[idx] ? () => setFocusedCard(idx) : undefined}
+                            back={cardBackFace()}
+                            front={cardFrontFace(card, idx)}
+                          />
                         </motion.div>
                       ) : (
                         <div className="w-full h-full rounded-xl border-2 border-dashed border-brand-gold/25 bg-brand-gold/[0.03] flex items-center justify-center">
@@ -854,34 +855,15 @@ export default function ReadingRoom({ onSaveReading }: ReadingRoomProps) {
               })}
             </div>
 
-            {/* Card fan */}
+            {/* Card fan — deal-in stagger, pointer-proximity spread, drag to browse */}
             {pickedFan.length < drawnCards.length && (
-              <div className="relative h-44 md:h-52 max-w-4xl mx-auto overflow-visible select-none" style={{ touchAction: 'manipulation' }}>
-                {Array.from({ length: FAN_SIZE }).map((_, j) => {
-                  if (pickedFan.includes(j)) return null;
-                  const t = j / (FAN_SIZE - 1);
-                  const ang = -62 + 124 * t;
-                  const rad = (ang * Math.PI) / 180;
-                  const lift = (Math.cos(rad) - Math.cos((62 * Math.PI) / 180)) * 130;
-                  return (
-                    <div
-                      key={j}
-                      onClick={() => handleFanPick(j)}
-                      className="absolute w-14 h-24 md:w-16 md:h-28 cursor-pointer group/fan"
-                      style={{
-                        left: `calc(50% + ${(Math.sin(rad) * 44).toFixed(2)}% - 28px)`,
-                        bottom: `${lift.toFixed(1)}px`,
-                        transform: `rotate(${(ang * 0.55).toFixed(1)}deg)`,
-                        zIndex: 10 + j,
-                      }}
-                    >
-                      <div className="w-full h-full rounded-lg border border-brand-gold/30 bg-brand-purple/40 shadow-md overflow-hidden group-hover/fan:border-brand-gold group-hover/fan:shadow-[0_0_15px_rgba(233,195,73,0.35)] group-hover/fan:-translate-y-4 transition-all duration-200">
-                        <img src={CARD_BACK_URL} alt="Card back" referrerPolicy="no-referrer" className="w-full h-full object-cover pointer-events-none" />
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
+              <CardFan
+                className="relative h-44 md:h-52 max-w-4xl mx-auto overflow-visible select-none"
+                total={FAN_SIZE}
+                taken={pickedFan}
+                onPick={handleFanPick}
+                back={<CardBackArt className="w-full h-full object-cover pointer-events-none" />}
+              />
             )}
 
             {allCardsFlipped && (
@@ -913,11 +895,11 @@ export default function ReadingRoom({ onSaveReading }: ReadingRoomProps) {
             <div className="flex justify-between items-center border-b border-brand-gold/10 pb-4">
               <div>
                 <span className="font-mono text-xs text-brand-gold">TÀNG THƯ CHIÊM BÓI</span>
-                <h3 className="font-serif text-xl text-white font-bold">{aspect} - Seeker Reading</h3>
+                <h3 className="font-serif text-xl text-ink-strong font-bold">{aspect} - Seeker Reading</h3>
               </div>
               <button
                 onClick={handleResetSession}
-                className="flex items-center gap-2 px-4 py-2 border border-brand-gold/20 rounded-xl font-mono text-xs text-brand-gold hover:text-white hover:bg-brand-gold/5 transition-colors cursor-pointer"
+                className="flex items-center gap-2 px-4 py-2 border border-brand-gold/20 rounded-xl font-mono text-xs text-brand-gold hover:text-ink-strong hover:bg-brand-gold/5 transition-colors cursor-pointer"
               >
                 <RefreshCw className="w-4 h-4" />
                 <span>Trải Quẻ Mới</span>
@@ -956,7 +938,7 @@ export default function ReadingRoom({ onSaveReading }: ReadingRoomProps) {
                       <h4 className="font-serif text-[11px] md:text-xs text-brand-gold font-bold truncate max-w-[120px] mx-auto">
                         {card.name}
                       </h4>
-                      <span className="font-mono text-[8px] text-gray-400 block">
+                      <span className="font-mono text-[8px] text-ink-muted block">
                         {orientations[index] === 'reversed' ? 'Chiều Ngược' : 'Chiều Xuôi'}
                       </span>
                     </div>
@@ -1060,6 +1042,31 @@ export default function ReadingRoom({ onSaveReading }: ReadingRoomProps) {
         )}
 
       </AnimatePresence>
+
+      {/* Focus & pulse — tap a revealed card and it flies out of the spread to
+          the centre of a blurred field, wrapped in drifting dust. */}
+      {focusedCard !== null && drawnCards[focusedCard] && (
+        <FocusOverlay
+          open
+          onClose={() => setFocusedCard(null)}
+          layoutId={`reading-card-${focusedCard}`}
+          title={drawnCards[focusedCard].name}
+          subtitle={`${getPositionLabel(focusedCard)} · ${
+            orientations[focusedCard] === 'reversed' ? 'Chiều ngược' : 'Chiều xuôi'
+          }`}
+          card={
+            <div className="aspect-[2/3] w-full">
+              {cardFrontFace(drawnCards[focusedCard], focusedCard)}
+            </div>
+          }
+        >
+          <p className="font-sans text-sm text-on-background leading-relaxed text-center prose-measure mx-auto">
+            {orientations[focusedCard] === 'reversed'
+              ? drawnCards[focusedCard].reversed
+              : drawnCards[focusedCard].upright}
+          </p>
+        </FocusOverlay>
+      )}
     </div>
   );
 }
