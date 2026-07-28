@@ -130,7 +130,7 @@ export default function TarotJournal({ historyList, onUpdateHistory, onNavigateT
             <div className="grid grid-cols-12 gap-1.5" id="frequency-map">
               {heatmapDays.map((day) => {
                 const intensity = Math.min(day.count, 4);
-                let bgClass = 'bg-brand-purple/10 border-white/5';
+                let bgClass = 'bg-brand-purple/10 border-line';
                 if (intensity === 1) bgClass = 'bg-brand-gold/30 border-brand-gold/15';
                 else if (intensity === 2) bgClass = 'bg-brand-gold/55 border-brand-gold/25';
                 else if (intensity === 3) bgClass = 'bg-brand-gold/80 border-brand-gold/35';
@@ -150,7 +150,7 @@ export default function TarotJournal({ historyList, onUpdateHistory, onNavigateT
             <div className="mt-5 flex justify-between text-[10px] text-on-surface-variant font-mono tracking-wider">
               <span>ÍT HƠN</span>
               <div className="flex gap-1.5 items-center">
-                <div className="w-2.5 h-2.5 rounded-[2px] bg-brand-purple/10 border border-white/5"></div>
+                <div className="w-2.5 h-2.5 rounded-[2px] bg-brand-purple/10 border border-line"></div>
                 <div className="w-2.5 h-2.5 rounded-[2px] bg-brand-gold/20"></div>
                 <div className="w-2.5 h-2.5 rounded-[2px] bg-brand-gold/40"></div>
                 <div className="w-2.5 h-2.5 rounded-[2px] bg-brand-gold/70"></div>
@@ -194,7 +194,7 @@ export default function TarotJournal({ historyList, onUpdateHistory, onNavigateT
             <div className="flex items-center gap-2">
               <span className="font-mono text-[10px] text-on-surface-variant uppercase">Lọc khía cạnh:</span>
               <select
-                className="bg-brand-purple/40 border border-outline/20 text-on-background font-mono text-[10px] rounded-full px-3 py-1.5 focus:border-brand-gold focus:ring-0 outline-none transition-colors"
+                className="bg-brand-purple/40 border border-line text-on-background font-mono text-[10px] rounded-full px-3 py-1.5 focus:border-brand-gold focus:ring-0 outline-none transition-colors"
                 value={filterAspect}
                 onChange={(e) => setFilterAspect(e.target.value)}
               >
@@ -317,7 +317,7 @@ export default function TarotJournal({ historyList, onUpdateHistory, onNavigateT
                 </div>
                 <button
                   onClick={() => setSelectedReading(null)}
-                  className="p-2 text-on-surface-variant hover:text-white bg-brand-purple/40 rounded-full transition-colors outline-none"
+                  className="p-2 text-on-surface-variant hover:text-ink-strong bg-brand-purple/40 rounded-full transition-colors outline-none"
                 >
                   <X className="w-5 h-5" />
                 </button>
@@ -345,7 +345,7 @@ export default function TarotJournal({ historyList, onUpdateHistory, onNavigateT
                           />
                           <div>
                             <span className="font-mono text-[9px] text-brand-cyan tracking-wider uppercase block">{stepName}</span>
-                            <span className="font-serif text-xs text-white font-bold">{card.name}</span>
+                            <span className="font-serif text-xs text-ink-strong font-bold">{card.name}</span>
                           </div>
                         </div>
                       ) : null;
@@ -354,7 +354,7 @@ export default function TarotJournal({ historyList, onUpdateHistory, onNavigateT
                 </div>
 
                 {/* 2. AI reading response container text */}
-                <div className="markdown-body p-4 bg-brand-purple/10 border border-white/5 rounded-2xl text-on-background">
+                <div className="markdown-body p-4 bg-brand-purple/10 border border-line rounded-2xl text-on-background">
                   <Markdown>{selectedReading.aiResponse}</Markdown>
                 </div>
 
@@ -375,7 +375,7 @@ export default function TarotJournal({ historyList, onUpdateHistory, onNavigateT
                   {/* Actions inside form note custom notes */}
                   <div className="flex justify-end gap-3 items-center">
                     {saveSuccess && (
-                      <span className="text-xs text-green-400 font-mono flex items-center gap-1 animate-pulse">
+                      <span className="text-xs text-success font-mono flex items-center gap-1 animate-pulse">
                         <Check className="w-4 h-4" /> Đã lưu thành công
                       </span>
                     )}

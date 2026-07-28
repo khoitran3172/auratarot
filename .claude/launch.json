@@ -4,7 +4,7 @@
     {
       "name": "aura-tarot",
       "runtimeExecutable": "cmd",
-      "runtimeArgs": ["/c", "set NODE_ENV=production&& npx tsx server.ts"],
+      "runtimeArgs": ["/c", "npx vite --port 3000 --strictPort"],
       "port": 3000,
       "autoPort": true
     }

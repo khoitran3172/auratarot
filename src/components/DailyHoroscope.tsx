@@ -244,10 +244,10 @@ export default function DailyHoroscope() {
             Dự Báo Hàng Ngày • {new Date().toLocaleDateString('vi-VN', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
           </span>
         </div>
-        <h3 className="font-serif text-3xl md:text-4xl text-white font-bold tracking-tight">
+        <h3 className="font-serif text-3xl md:text-4xl text-ink-strong font-bold tracking-tight">
           Dự Báo Cung Hoàng Đạo
         </h3>
-        <p className="text-sm text-gray-400 max-w-xl mx-auto font-sans leading-relaxed">
+        <p className="text-sm text-ink-muted max-w-xl mx-auto font-sans leading-relaxed">
           Sự hòa quyện giữa thế giới linh ảnh lá bài Tarot và chu kỳ di chuyển các vì sao. Nhận thông điệp chỉ dẫn cá nhân hóa tức thì.
         </p>
       </div>
@@ -282,7 +282,7 @@ export default function DailyHoroscope() {
                         className={`flex items-center gap-2 px-3 py-2.5 rounded-xl border text-left transition-all cursor-pointer ${
                           selectedAspect === asp.id
                             ? 'bg-brand-gold/10 border-brand-gold text-brand-gold'
-                            : 'bg-brand-void/30 border-white/5 text-gray-400 hover:text-white hover:border-white/10'
+                            : 'bg-brand-void/30 border-line text-ink-muted hover:text-ink-strong hover:border-line'
                         }`}
                       >
                         <Icon className="w-4 h-4 shrink-0" />
@@ -308,19 +308,19 @@ export default function DailyHoroscope() {
                       className={`flex flex-col items-center justify-center p-2.5 rounded-xl border transition-all cursor-pointer text-center relative overflow-hidden ${
                         selectedZodiac === z.id
                           ? 'bg-brand-cyan/15 border-brand-cyan text-brand-cyan shadow-[0_0_12px_rgba(0,219,233,0.15)]'
-                          : 'bg-brand-void/30 border-white/5 text-gray-400 hover:text-white hover:border-white/10'
+                          : 'bg-brand-void/30 border-line text-ink-muted hover:text-ink-strong hover:border-line'
                       }`}
                     >
                       <span className="text-2xl mb-1 filter drop-shadow-[0_2px_5px_rgba(0,0,0,0.5)]">{z.icon}</span>
                       <span className="text-xs font-serif font-bold tracking-wide">{z.viName}</span>
-                      <span className="text-[9px] font-mono text-gray-500 mt-0.5 leading-none">{z.range}</span>
+                      <span className="text-[9px] font-mono text-ink-muted mt-0.5 leading-none">{z.range}</span>
                     </button>
                   ))}
                 </div>
               </div>
 
               {errorMess && (
-                <div className="p-3.5 bg-red-950/45 border border-red-500/20 text-red-300 rounded-xl text-xs font-sans">
+                <div className="p-3.5 bg-danger/15 border border-danger/20 text-danger rounded-xl text-xs font-sans">
                   ⚠️ {errorMess}
                 </div>
               )}
@@ -335,7 +335,7 @@ export default function DailyHoroscope() {
                     <Sparkles className="w-4 h-4 text-brand-void group-hover:animate-spin" />
                     Khởi Tạo Thông Điệp Ngày Mới
                   </span>
-                  <div className="absolute inset-0 bg-white opacity-0 group-hover:opacity-10 transition-opacity"></div>
+                  <div className="absolute inset-0 bg-ink-strong opacity-0 group-hover:opacity-10 transition-opacity"></div>
                 </button>
               </div>
 
@@ -377,7 +377,7 @@ export default function DailyHoroscope() {
             >
               {loadingTexts[loadingTextIndex]}
             </motion.p>
-            <p className="text-xs text-gray-500 font-mono tracking-widest uppercase mt-4">
+            <p className="text-xs text-ink-muted font-mono tracking-widest uppercase mt-4">
               Tàng Thư Aura • Dòng Sông Năng Lượng Vũ Trụ
             </p>
           </motion.div>
@@ -430,7 +430,7 @@ export default function DailyHoroscope() {
 
                   {/* Card Title block */}
                   <div className="p-3 text-center bg-brand-void relative z-10 border-t border-brand-gold/10">
-                    <span className="font-mono text-[9px] text-gray-500 uppercase tracking-widest">{drawnCard?.englishName}</span>
+                    <span className="font-mono text-[9px] text-ink-muted uppercase tracking-widest">{drawnCard?.englishName}</span>
                     <h4 className="font-serif text-base text-brand-gold font-bold leading-tight mt-0.5">
                       {drawnCard?.name}
                     </h4>
@@ -439,11 +439,11 @@ export default function DailyHoroscope() {
               </motion.div>
 
               {/* Little stats summary beneath card block */}
-              <div className="glass-card w-full py-3.5 px-4 rounded-xl border border-white/5 text-center bg-brand-void/40">
-                <p className="text-[10px] font-mono uppercase text-gray-500 tracking-wider">Tinh chiếu tương khắc</p>
+              <div className="glass-card w-full py-3.5 px-4 rounded-xl border border-line text-center bg-brand-void/40">
+                <p className="text-[10px] font-mono uppercase text-ink-muted tracking-wider">Tinh chiếu tương khắc</p>
                 <div className="flex justify-center items-center gap-1.5 mt-1">
                   <span className="text-xl">{zInfo?.icon}</span>
-                  <span className="font-serif font-bold text-sm text-gray-300">{zInfo?.viName} ({zInfo?.name})</span>
+                  <span className="font-serif font-bold text-sm text-ink">{zInfo?.viName} ({zInfo?.name})</span>
                   <span className="w-1.5 h-1.5 bg-brand-cyan/60 rounded-full mx-1"></span>
                   <span className="font-mono text-xs text-brand-cyan font-bold">{zInfo?.element}</span>
                 </div>
@@ -458,14 +458,14 @@ export default function DailyHoroscope() {
 
               <div className="space-y-4">
                 {/* Result header navigation bar details */}
-                <div className="flex items-center justify-between border-b border-white/5 pb-4">
+                <div className="flex items-center justify-between border-b border-line pb-4">
                   <div className="flex items-center gap-2">
                     <div className="p-2 rounded-lg bg-brand-cyan/10 text-brand-cyan">
                       {aInfo ? <aInfo.icon className="w-5 h-5" /> : <Star className="w-5 h-5" />}
                     </div>
                     <div>
-                      <p className="text-xs text-gray-500 font-mono uppercase tracking-widest">Tuyển tập tiên tri</p>
-                      <h4 className="font-serif text-lg font-bold text-white leading-none mt-1">
+                      <p className="text-xs text-ink-muted font-mono uppercase tracking-widest">Tuyển tập tiên tri</p>
+                      <h4 className="font-serif text-lg font-bold text-ink-strong leading-none mt-1">
                         Dự báo: {aInfo?.name}
                       </h4>
                     </div>
@@ -474,12 +474,12 @@ export default function DailyHoroscope() {
                   <div className="flex gap-2">
                     <button
                       onClick={handleCopyText}
-                      className="p-2 py-1.5 rounded-lg bg-brand-purple/10 border border-brand-gold/15 text-brand-gold hover:text-white hover:border-brand-gold hover:bg-brand-gold/10 text-xs font-mono flex items-center gap-1.5 transition-all cursor-pointer"
+                      className="p-2 py-1.5 rounded-lg bg-brand-purple/10 border border-brand-gold/15 text-brand-gold hover:text-ink-strong hover:border-brand-gold hover:bg-brand-gold/10 text-xs font-mono flex items-center gap-1.5 transition-all cursor-pointer"
                       title="Copy thông báo Horoscope"
                     >
                       {copied ? (
                         <>
-                          <Check className="w-3.5 h-3.5 text-green-400" />
+                          <Check className="w-3.5 h-3.5 text-success" />
                           <span>Đã sao chép</span>
                         </>
                       ) : (
@@ -493,7 +493,7 @@ export default function DailyHoroscope() {
                 </div>
 
                 {/* Horoscope Text Wrapper scrolling container */}
-                <div className="relative text-gray-200 font-sans text-sm md:text-base leading-relaxed max-h-[460px] overflow-y-auto pr-2 space-y-4 scrollbar-thin">
+                <div className="relative text-ink font-sans text-sm md:text-base leading-relaxed max-h-[460px] overflow-y-auto pr-2 space-y-4 scrollbar-thin">
                   <div className="markdown-body prose prose-invert max-w-none">
                     <ReactMarkdown>{horoscope.horoscopeText}</ReactMarkdown>
                   </div>
@@ -502,8 +502,8 @@ export default function DailyHoroscope() {
               </div>
 
               {/* Reset Draw trigger bottom bar */}
-              <div className="border-t border-white/5 pt-6 mt-6 flex justify-between items-center bg-brand-void/30 -mx-6 md:-mx-8 -mb-6 md:-mb-8 p-6 rounded-b-2xl">
-                <span className="text-[10px] font-mono text-gray-500 tracking-wider flex items-center gap-1 uppercase">
+              <div className="border-t border-line pt-6 mt-6 flex justify-between items-center bg-brand-void/30 -mx-6 md:-mx-8 -mb-6 md:-mb-8 p-6 rounded-b-2xl">
+                <span className="text-[10px] font-mono text-ink-muted tracking-wider flex items-center gap-1 uppercase">
                   <Sparkles className="w-3.5 h-3.5 text-brand-cyan" />
                   Hào quang tinh tú dệt ban mai hôm nay
                 </span>

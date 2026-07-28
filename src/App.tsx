@@ -9,8 +9,10 @@ import DailyHoroscope from './components/DailyHoroscope';
 import TarotJournal from './components/TarotJournal';
 import TarotEncyclopedia from './components/TarotEncyclopedia';
 import { ReadingHistory } from './types';
-import { Compass, Sun, Orbit, Hash, Grid3x3, BookOpen, NotebookPen, Sparkles } from 'lucide-react';
+import { Compass, Sun, Orbit, Hash, Grid3x3, BookOpen, NotebookPen } from 'lucide-react';
 import { motion } from 'motion/react';
+import { useTheme } from './theme';
+import { LoadingPanel, ThemeSwitcher } from './components/ui';
 
 // Heavy features bundle large interpretation datasets — load them on demand
 const NatalChart = lazy(() => import('./components/NatalChart'));
@@ -29,18 +31,10 @@ const navItems: { view: View; label: string; icon: typeof Compass }[] = [
   { view: 'Library', label: 'Thư viện', icon: BookOpen },
 ];
 
-function LoadingView({ label }: { label: string }) {
-  return (
-    <div className="flex flex-col items-center justify-center py-32 gap-4">
-      <Sparkles className="w-8 h-8 text-brand-gold animate-pulse" />
-      <span className="font-mono text-xs text-brand-gold tracking-widest uppercase">{label}</span>
-    </div>
-  );
-}
-
 export default function App() {
   const [currentView, setCurrentView] = useState<View>('Reading');
   const [historyList, setHistoryList] = useState<ReadingHistory[]>([]);
+  const { theme, setTheme } = useTheme();
 
   // Load reading history from localStorage
   useEffect(() => {
@@ -84,44 +78,47 @@ export default function App() {
   };
 
   return (
-    <div className="bg-brand-void text-on-background min-h-screen selection:bg-brand-gold/30 selection:text-white pb-24 md:pb-0">
+    <div className="bg-bg text-ink min-h-screen pb-24 md:pb-0">
 
       {/* Top Header Navigation bar */}
-      <header className="fixed top-0 w-full z-40 bg-brand-void/40 backdrop-blur-xl border-b border-brand-gold/10 shadow-[0_0_20px_rgba(197,160,89,0.06)]">
+      <header className="fixed top-0 w-full z-40 bg-bg-elevated/70 backdrop-blur-xl border-b border-line">
         <div className="flex items-center justify-between gap-4 px-4 md:px-8 lg:px-12 h-16 w-full max-w-7xl mx-auto font-sans">
 
-          {/* Logo Brand tag */}
-          <div
+          {/* Logo — a real button, so it is reachable and operable by keyboard.
+              It was a div with an onClick before. */}
+          <button
+            type="button"
             onClick={() => navigateTo('Reading')}
-            className="flex items-center gap-3 text-brand-gold cursor-pointer group shrink-0"
+            aria-label="Về phòng trải bài"
+            className="flex items-center gap-3 cursor-pointer shrink-0 rounded-lg"
           >
-            <div className="w-8 h-8 rounded-full border border-brand-gold/50 flex items-center justify-center shrink-0">
-              <div className="w-4 h-4 rounded-full bg-gradient-to-tr from-brand-gold to-transparent"></div>
-            </div>
-            <h1 className="font-serif text-lg md:text-xl font-bold tracking-tight text-brand-gold whitespace-nowrap">
+            <span className="w-8 h-8 rounded-full border border-accent/50 flex items-center justify-center shrink-0" aria-hidden>
+              <span className="w-4 h-4 rounded-full bg-gradient-to-tr from-accent to-transparent" />
+            </span>
+            <span className="font-serif text-lg md:text-xl font-bold tracking-display text-accent whitespace-nowrap">
               AURA TAROT
-            </h1>
-          </div>
+            </span>
+          </button>
 
           {/* Desktop Navigation Links */}
-          <div className="hidden md:flex gap-5 lg:gap-10 items-center justify-center flex-1">
+          <nav aria-label="Điều hướng chính" className="hidden md:flex gap-5 lg:gap-8 items-center justify-center flex-1">
             {navItems.map(({ view, label }) => (
               <button
                 key={view}
                 onClick={() => navigateTo(view)}
-                className={`tracking-wider text-[11px] uppercase whitespace-nowrap transition-all duration-300 outline-none cursor-pointer pb-1 border-b ${
-                  currentView === view ? 'text-brand-gold border-brand-gold font-semibold' : 'text-white/60 hover:text-white border-transparent'
+                aria-current={currentView === view ? 'page' : undefined}
+                className={`tracking-wider text-[11px] uppercase whitespace-nowrap transition-colors duration-200 cursor-pointer pb-1 border-b ${
+                  currentView === view ? 'text-accent border-accent font-semibold' : 'text-ink-muted hover:text-ink-strong border-transparent'
                 }`}
               >
                 {label}
               </button>
             ))}
-          </div>
+          </nav>
 
-          {/* Right section: Status indicator */}
+          {/* Right section: visual-direction picker (redesign scaffolding) */}
           <div className="flex items-center gap-2 shrink-0">
-            <span className="hidden lg:inline text-[10px] text-gray-400 uppercase tracking-widest font-mono whitespace-nowrap">Ma thuật • Sẵn sàng</span>
-            <div className="w-1.5 h-1.5 rounded-full bg-green-500 shadow-[0_0_8px_#22c55e]"></div>
+            <ThemeSwitcher theme={theme} onChange={setTheme} />
           </div>
 
         </div>
@@ -132,6 +129,12 @@ export default function App() {
           AnimatePresence mode="wait" bị treo ở view cũ khiến điều hướng chết hẳn.
           Chỉ cần motion.div có key đổi theo view là đủ hiệu ứng fade khi vào. */}
       <main className="pt-20 min-h-[calc(100vh-4rem)]">
+        {/* The document had no h1 at all: every screen starts its own outline
+            at h2. Until the screens adopt SectionHeader (which can render h1),
+            this names the current view for assistive tech and search. */}
+        <h1 className="sr-only">
+          Aura Tarot — {navItems.find((n) => n.view === currentView)?.label ?? 'Trải bài'}
+        </h1>
         <motion.div
           key={currentView}
           initial={{ opacity: 0 }}
@@ -143,19 +146,19 @@ export default function App() {
             {currentView === 'Daily' && <DailyHoroscope />}
 
             {currentView === 'Chart' && (
-              <Suspense fallback={<LoadingView label="Đang triệu hồi tinh bàn..." />}>
+              <Suspense fallback={<LoadingPanel label="Đang triệu hồi tinh bàn..." />}>
                 <NatalChart />
               </Suspense>
             )}
 
             {currentView === 'Numerology' && (
-              <Suspense fallback={<LoadingView label="Đang giải mã những con số..." />}>
+              <Suspense fallback={<LoadingPanel label="Đang giải mã những con số..." />}>
                 <Numerology />
               </Suspense>
             )}
 
             {currentView === 'TuVi' && (
-              <Suspense fallback={<LoadingView label="Đang an sao lập lá số..." />}>
+              <Suspense fallback={<LoadingPanel label="Đang an sao lập lá số..." />}>
                 <TuViChart />
               </Suspense>
             )}
@@ -173,19 +176,27 @@ export default function App() {
       </main>
 
       {/* Fixed Sticky Mobile Bottom Navigation Bar (Visible only on mobile devices) */}
-      <nav className="md:hidden fixed bottom-0 left-0 w-full z-45 bg-brand-void/80 backdrop-blur-2xl border-t border-brand-gold/15 shadow-[0_-4px_20px_rgba(233,195,73,0.08)] rounded-t-2xl h-18 flex justify-around items-center px-4 py-2 pb-safe select-none">
+      <nav
+        aria-label="Điều hướng chính"
+        className="md:hidden fixed bottom-0 left-0 w-full z-45 bg-bg-elevated/90 backdrop-blur-2xl border-t border-line rounded-t-2xl flex justify-around items-stretch px-1 pb-safe select-none"
+      >
         {navItems.map(({ view, label, icon: Icon }) => (
           <button
             key={view}
             onClick={() => navigateTo(view)}
-            className={`flex flex-col items-center justify-center p-2 outline-none transition-all ${
-              currentView === view
-                ? 'text-brand-gold scale-110 drop-shadow-[0_0_8px_rgba(233,195,73,0.4)]'
-                : 'text-on-surface-variant/60 hover:text-brand-gold'
+            aria-current={currentView === view ? 'page' : undefined}
+            className={`flex-1 min-w-0 tap-target flex flex-col items-center justify-start gap-1 pt-2 transition-colors ${
+              currentView === view ? 'text-accent' : 'text-ink-subtle hover:text-accent'
             }`}
           >
-            <Icon className="w-5.5 h-5.5" />
-            <span className="font-mono text-[9px] mt-1 font-semibold uppercase">{label}</span>
+            <Icon className="w-5 h-5 shrink-0" aria-hidden />
+            {/* 10px is the floor for a legible label at this width; the
+                previous 9px sat below it. Two of the seven labels wrap to two
+                lines, so the row is top-aligned to keep the icons on one line
+                — the real fix is fewer top-level destinations. */}
+            <span className="font-mono text-[10px] font-semibold uppercase leading-tight text-center px-0.5">
+              {label}
+            </span>
           </button>
         ))}
       </nav>

@@ -121,7 +121,7 @@ export default function Numerology() {
               onChange={(e) => setFullName(e.target.value)}
               placeholder="vd: Nguyễn Văn An (có dấu hay không đều được)"
               maxLength={100}
-              className="w-full px-4 py-3 bg-brand-void/60 border border-white/10 rounded-xl font-sans text-sm text-gray-200 outline-none focus:border-brand-gold/50 transition-colors placeholder:text-gray-500"
+              className="w-full px-4 py-3 bg-brand-void/60 border border-line rounded-xl font-sans text-sm text-ink outline-none focus:border-brand-gold/50 transition-colors placeholder:text-ink-muted"
             />
           </div>
           <div className="space-y-2">
@@ -133,13 +133,13 @@ export default function Numerology() {
               value={birthDate}
               onChange={(e) => setBirthDate(e.target.value)}
               required
-              className="w-full px-4 py-3 bg-brand-void/60 border border-white/10 rounded-xl font-sans text-sm text-gray-200 outline-none focus:border-brand-gold/50 transition-colors [color-scheme:dark]"
+              className="w-full px-4 py-3 bg-brand-void/60 border border-line rounded-xl font-sans text-sm text-ink outline-none focus:border-brand-gold/50 transition-colors"
             />
           </div>
         </div>
 
         {error && (
-          <div className="p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-xs text-red-400 font-sans flex items-center gap-2">
+          <div className="p-3 rounded-xl bg-danger/10 border border-danger/20 text-xs text-danger font-sans flex items-center gap-2">
             <AlertCircle className="w-4 h-4 shrink-0" />
             <span>{error}</span>
           </div>
@@ -185,7 +185,7 @@ export default function Numerology() {
                         <span className="inline-block font-mono text-[8px] text-brand-cyan border border-brand-cyan/30 bg-brand-cyan/10 px-2 py-0.5 rounded-full tracking-wider">SỐ MASTER</span>
                       )}
                       {core.karmicDebt && (
-                        <span className="inline-block font-mono text-[8px] text-red-400 border border-red-400/30 bg-red-400/10 px-2 py-0.5 rounded-full tracking-wider">NỢ NGHIỆP {core.karmicDebt}</span>
+                        <span className="inline-block font-mono text-[8px] text-danger border border-danger/30 bg-danger/10 px-2 py-0.5 rounded-full tracking-wider">NỢ NGHIỆP {core.karmicDebt}</span>
                       )}
                     </div>
                   );
@@ -207,12 +207,12 @@ export default function Numerology() {
                   >
                     <p>{reading.description}</p>
                     <p><span className="text-brand-gold font-semibold">Điểm sáng:</span> {reading.strengths}</p>
-                    <p><span className="text-red-400/90 font-semibold">Vùng tối:</span> {reading.challenges}</p>
+                    <p><span className="text-danger font-semibold">Vùng tối:</span> {reading.challenges}</p>
                     {core.karmicDebt && (
-                      <div className="border-t border-red-400/15 pt-3 space-y-1">
-                        <p className="font-mono text-[10px] text-red-400/90 tracking-wider uppercase">{karmicDebtReadings[core.karmicDebt].title}</p>
+                      <div className="border-t border-danger/15 pt-3 space-y-1">
+                        <p className="font-mono text-[10px] text-danger tracking-wider uppercase">{karmicDebtReadings[core.karmicDebt].title}</p>
                         <p>{karmicDebtReadings[core.karmicDebt].description}</p>
-                        <p className="text-red-300/80 italic">{karmicDebtReadings[core.karmicDebt].advice}</p>
+                        <p className="text-danger italic">{karmicDebtReadings[core.karmicDebt].advice}</p>
                       </div>
                     )}
                     <p className="text-brand-cyan/90 italic">✦ {reading.advice}</p>
@@ -229,13 +229,13 @@ export default function Numerology() {
                 {LOSHU_LAYOUT.flat().map(digit => {
                   const count = result.loShu.counts[digit];
                   return (
-                    <div key={digit} className={`aspect-square rounded-xl border flex flex-col items-center justify-center ${count > 0 ? 'border-brand-gold/40 bg-brand-gold/5' : 'border-white/10 bg-brand-void/40'}`}>
+                    <div key={digit} className={`aspect-square rounded-xl border flex flex-col items-center justify-center ${count > 0 ? 'border-brand-gold/40 bg-brand-gold/5' : 'border-line bg-brand-void/40'}`}>
                       {count > 0 ? (
                         <span className="font-serif text-xl md:text-2xl text-brand-gold font-bold tracking-wider">
                           {String(digit).repeat(Math.min(count, 4))}
                         </span>
                       ) : (
-                        <span className="font-serif text-lg text-white/15">{digit}</span>
+                        <span className="font-serif text-lg text-ink-subtle">{digit}</span>
                       )}
                       <span className="font-mono text-[8px] text-on-surface-variant/50 mt-0.5">{count > 0 ? `×${count}` : 'thiếu'}</span>
                     </div>
@@ -254,7 +254,7 @@ export default function Numerology() {
                   ))}
                   {result.loShu.emptyArrows.map(id => (
                     <p key={id}>
-                      <span className="text-red-400/90 font-semibold">➤ Khuyết {arrowReadings[id].name} ({arrowReadings[id].digits.join('-')}):</span>{' '}
+                      <span className="text-danger font-semibold">➤ Khuyết {arrowReadings[id].name} ({arrowReadings[id].digits.join('-')}):</span>{' '}
                       {arrowReadings[id].empty}
                     </p>
                   ))}
@@ -267,7 +267,7 @@ export default function Numerology() {
                   <ReadingCard heading={`Những con số thiếu vắng (${result.loShu.missing.join(', ')})`} sub="BÀI HỌC CẦN BÙ ĐẮP">
                     {result.loShu.missing.map(d => (
                       <div key={d} className="space-y-1">
-                        <p className="font-mono text-[10px] text-red-400/90 tracking-wider uppercase">{missingNumberReadings[d as 1].title}</p>
+                        <p className="font-mono text-[10px] text-danger tracking-wider uppercase">{missingNumberReadings[d as 1].title}</p>
                         <p>{missingNumberReadings[d as 1].description} <span className="text-brand-cyan/90 italic">{missingNumberReadings[d as 1].advice}</span></p>
                       </div>
                     ))}
@@ -331,7 +331,7 @@ export default function Numerology() {
                         </span>
                         <div className="text-sm font-sans space-y-1.5 leading-relaxed">
                           <p><span className="text-brand-gold font-semibold">Đỉnh cao {p.value}:</span> {pinnacle ? pinnacle.description : ''}</p>
-                          <p className="text-on-surface-variant"><span className="text-red-400/90 font-semibold">Thách thức {ch.value}:</span> {challenge ? challenge.description : ''}</p>
+                          <p className="text-on-surface-variant"><span className="text-danger font-semibold">Thách thức {ch.value}:</span> {challenge ? challenge.description : ''}</p>
                         </div>
                       </div>
                     );

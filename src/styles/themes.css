@@ -1,0 +1,200 @@
+/**
+ * Aura Tarot — visual directions.
+ *
+ * Every value here is a RAW theme variable (prefix `--t-`). Nothing in the app
+ * references these directly: `index.css` maps them onto semantic Tailwind
+ * tokens via `@theme inline`, and components only ever use the semantic names.
+ *
+ * That means swapping a direction is swapping one block below — no component
+ * touches, no conditionals. Switch with `<html data-theme="parchment">`.
+ *
+ * Contrast: every text-on-surface pair in all three directions passes WCAG 2.1
+ * AA for normal text (lowest ratio in the set is 4.71:1). Verified numerically,
+ * not by eye — see the checker in the design-system notes.
+ */
+
+/* ==========================================================================
+   Direction A — "Obsidian & Brass"
+   Evolution of the current look, disciplined. Near-black with a cool
+   undertone, brass accent, glass surfaces, glow used as punctuation instead
+   of decoration. Playfair display + Inter body.
+   ========================================================================== */
+:root,
+[data-theme='obsidian'] {
+  color-scheme: dark;
+
+  --t-bg: #07070c;
+  --t-bg-elevated: #0b0b14;
+  --t-surface: #12121c;
+  --t-surface-2: #1a1a28;
+  --t-surface-3: #0a0a11;
+
+  --t-text-strong: #f5f2ea;
+  --t-text: #dcd8ce;
+  --t-text-muted: #a8a29a;
+  --t-text-subtle: #8c867c;
+
+  --t-accent: #d8b36a;
+  --t-accent-strong: #e8c987;
+  --t-accent-contrast: #0a0a11;
+  --t-accent-2: #5fa8a0;
+  --t-accent-2-contrast: #0a0a11;
+
+  --t-danger: #e88a7d;
+  --t-success: #7fbf8f;
+  --t-warning: #e0b355;
+
+  --t-line: color-mix(in oklab, var(--t-accent) 18%, transparent);
+  --t-line-strong: color-mix(in oklab, var(--t-accent) 38%, transparent);
+  --t-focus: var(--t-accent);
+
+  /* Surface treatment — glass */
+  --t-card-bg: color-mix(in oklab, var(--t-text-strong) 3%, transparent);
+  --t-card-border: 1px solid var(--t-line);
+  --t-card-blur: blur(16px);
+  --t-card-shadow: 0 1px 0 color-mix(in oklab, var(--t-text-strong) 5%, transparent) inset;
+  --t-raised-shadow: 0 18px 50px -12px rgb(0 0 0 / 0.7);
+  /* Opaque surface for overlays (menus, popovers, dialogs). Glass is right
+     for inline cards but lets page content bleed through a floating panel. */
+  --t-overlay-bg: #14141f;
+  --t-glow-accent: 0 0 28px color-mix(in oklab, var(--t-accent) 26%, transparent);
+
+  /* Typography */
+  --t-font-display: 'Playfair Display', Georgia, serif;
+  --t-font-body: 'Inter', ui-sans-serif, system-ui, sans-serif;
+  --t-font-mono: 'Space Grotesk', ui-monospace, SFMono-Regular, monospace;
+  --t-display-tracking: -0.02em;
+  --t-eyebrow-tracking: 0.22em;
+
+  /* Shape */
+  --t-radius-sm: 0.5rem;
+  --t-radius-md: 0.75rem;
+  --t-radius-lg: 1rem;
+  --t-radius-xl: 1.5rem;
+  --t-radius-2xl: 1.75rem;
+
+  --t-body-bg-image:
+    radial-gradient(900px 500px at 12% -8%, color-mix(in oklab, var(--t-accent) 8%, transparent), transparent 70%),
+    radial-gradient(700px 420px at 88% 4%, color-mix(in oklab, var(--t-accent-2) 7%, transparent), transparent 72%);
+}
+
+/* ==========================================================================
+   Direction B — "Celestial Parchment"
+   A light direction: aged paper, deep ink, oxblood and indigo. Reads like an
+   antique occult manuscript rather than a neon app. Long interpretation text
+   is far easier on the eyes here, which matters — this app is mostly reading.
+   Cormorant Garamond display + Inter body.
+   ========================================================================== */
+[data-theme='parchment'] {
+  color-scheme: light;
+
+  --t-bg: #f4efe4;
+  --t-bg-elevated: #fbf8f1;
+  --t-surface: #fffdf7;
+  --t-surface-2: #f0e9da;
+  --t-surface-3: #eae2d0;
+
+  --t-text-strong: #1c1814;
+  --t-text: #33291f;
+  --t-text-muted: #665847;
+  --t-text-subtle: #6e6051;
+
+  --t-accent: #7a2e2e;
+  --t-accent-strong: #5e2020;
+  --t-accent-contrast: #fffdf7;
+  --t-accent-2: #2e3d7a;
+  --t-accent-2-contrast: #fffdf7;
+
+  --t-danger: #9b2226;
+  --t-success: #2f6b4f;
+  --t-warning: #8a5a12;
+
+  --t-line: color-mix(in oklab, var(--t-text-strong) 14%, transparent);
+  --t-line-strong: color-mix(in oklab, var(--t-text-strong) 30%, transparent);
+  --t-focus: var(--t-accent-2);
+
+  /* Surface treatment — printed paper: opaque, hairline rule, no blur */
+  --t-card-bg: var(--t-surface);
+  --t-card-border: 1px solid var(--t-line);
+  --t-card-blur: none;
+  --t-card-shadow: 0 1px 2px color-mix(in oklab, var(--t-text-strong) 6%, transparent);
+  --t-raised-shadow: 0 16px 40px -16px color-mix(in oklab, var(--t-text-strong) 28%, transparent);
+  --t-overlay-bg: #fffdf7;
+  --t-glow-accent: none;
+
+  --t-font-display: 'Cormorant Garamond', 'Playfair Display', Georgia, serif;
+  --t-font-body: 'Inter', ui-sans-serif, system-ui, sans-serif;
+  --t-font-mono: 'Space Grotesk', ui-monospace, SFMono-Regular, monospace;
+  --t-display-tracking: 0;
+  --t-eyebrow-tracking: 0.26em;
+
+  --t-radius-sm: 0.25rem;
+  --t-radius-md: 0.375rem;
+  --t-radius-lg: 0.5rem;
+  --t-radius-xl: 0.75rem;
+  --t-radius-2xl: 0.875rem;
+
+  /* Faint paper tone variation instead of glow */
+  --t-body-bg-image:
+    radial-gradient(1100px 620px at 8% -10%, color-mix(in oklab, var(--t-accent) 5%, transparent), transparent 68%),
+    radial-gradient(820px 500px at 92% 2%, color-mix(in oklab, var(--t-accent-2) 4%, transparent), transparent 70%);
+}
+
+/* ==========================================================================
+   Direction C — "Nocturne"
+   Modern editorial dark. Charcoal rather than black, one electric accent,
+   generous whitespace, no glass and no glow. Type and spacing carry the
+   design. Closest to Linear / Vercel discipline.
+   Inter throughout, display set tight and large.
+   ========================================================================== */
+[data-theme='nocturne'] {
+  color-scheme: dark;
+
+  --t-bg: #0d0d10;
+  --t-bg-elevated: #131317;
+  --t-surface: #17171c;
+  --t-surface-2: #1f1f26;
+  --t-surface-3: #101014;
+
+  --t-text-strong: #fafafa;
+  --t-text: #d4d4d8;
+  --t-text-muted: #a1a1aa;
+  --t-text-subtle: #8b8b96;
+
+  --t-accent: #a78bfa;
+  --t-accent-strong: #c4b5fd;
+  --t-accent-contrast: #101014;
+  --t-accent-2: #5eead4;
+  --t-accent-2-contrast: #101014;
+
+  --t-danger: #f87171;
+  --t-success: #6ee7a8;
+  --t-warning: #fbbf24;
+
+  --t-line: color-mix(in oklab, var(--t-text-strong) 10%, transparent);
+  --t-line-strong: color-mix(in oklab, var(--t-text-strong) 22%, transparent);
+  --t-focus: var(--t-accent);
+
+  /* Surface treatment — solid, flat, hairline border. No blur, no glow. */
+  --t-card-bg: var(--t-surface);
+  --t-card-border: 1px solid var(--t-line);
+  --t-card-blur: none;
+  --t-card-shadow: none;
+  --t-raised-shadow: 0 12px 32px -12px rgb(0 0 0 / 0.6);
+  --t-overlay-bg: #1c1c22;
+  --t-glow-accent: none;
+
+  --t-font-display: 'Inter', ui-sans-serif, system-ui, sans-serif;
+  --t-font-body: 'Inter', ui-sans-serif, system-ui, sans-serif;
+  --t-font-mono: 'Space Grotesk', ui-monospace, SFMono-Regular, monospace;
+  --t-display-tracking: -0.035em;
+  --t-eyebrow-tracking: 0.14em;
+
+  --t-radius-sm: 0.375rem;
+  --t-radius-md: 0.5rem;
+  --t-radius-lg: 0.625rem;
+  --t-radius-xl: 0.875rem;
+  --t-radius-2xl: 1rem;
+
+  --t-body-bg-image: none;
+}

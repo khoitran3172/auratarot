@@ -102,7 +102,7 @@ function ChartWheel({ chart }: { chart: NatalChartData }) {
         return (
           <g key={signId}>
             <line x1={x1} y1={y1} x2={x2} y2={y2} stroke="rgba(233,195,73,0.25)" strokeWidth="1" />
-            <text x={gx} y={gy} textAnchor="middle" dominantBaseline="central" fontSize="15" fill="#c5a059">
+            <text x={gx} y={gy} textAnchor="middle" dominantBaseline="central" fontSize="15" fill="var(--t-accent)">
               {signs[signId].glyph}
             </text>
           </g>
@@ -137,8 +137,8 @@ function ChartWheel({ chart }: { chart: NatalChartData }) {
         const [tx, ty] = toXY(lonD, rPlanet + 14);
         return (
           <g key={p.planet}>
-            <circle cx={dx} cy={dy} r="2" fill="#e9c349" />
-            <text x={px} y={py} textAnchor="middle" dominantBaseline="central" fontSize="14" fill="#fff">
+            <circle cx={dx} cy={dy} r="2" fill="var(--t-accent)" />
+            <text x={px} y={py} textAnchor="middle" dominantBaseline="central" fontSize="14" fill="var(--t-text-strong)">
               {planets[p.planet].glyph}
             </text>
             <text x={tx} y={ty} textAnchor="middle" dominantBaseline="central" fontSize="7" fill="rgba(233,195,73,0.8)" fontFamily="monospace">
@@ -152,7 +152,7 @@ function ChartWheel({ chart }: { chart: NatalChartData }) {
       {(() => {
         const [nx, ny] = toXY(chart.northNode.longitude, rPlanet);
         return (
-          <text x={nx} y={ny} textAnchor="middle" dominantBaseline="central" fontSize="12" fill="#a78bfa">☊</text>
+          <text x={nx} y={ny} textAnchor="middle" dominantBaseline="central" fontSize="12" fill="var(--t-accent-2)">☊</text>
         );
       })()}
 
@@ -163,8 +163,8 @@ function ChartWheel({ chart }: { chart: NatalChartData }) {
         const [lx, ly] = toXY(chart.ascendant.longitude, rOuter + 12);
         return (
           <g>
-            <line x1={x1} y1={y1} x2={x2} y2={y2} stroke="#5eead4" strokeWidth="1.5" />
-            <text x={lx} y={ly} textAnchor="middle" dominantBaseline="central" fontSize="9" fill="#5eead4" fontFamily="monospace">ASC</text>
+            <line x1={x1} y1={y1} x2={x2} y2={y2} stroke="var(--t-accent-2)" strokeWidth="1.5" />
+            <text x={lx} y={ly} textAnchor="middle" dominantBaseline="central" fontSize="9" fill="var(--t-accent-2)" fontFamily="monospace">ASC</text>
           </g>
         );
       })()}
@@ -176,8 +176,8 @@ function ChartWheel({ chart }: { chart: NatalChartData }) {
         const [lx, ly] = toXY(chart.midheaven.longitude, rOuter + 12);
         return (
           <g>
-            <line x1={x1} y1={y1} x2={x2} y2={y2} stroke="#e9c349" strokeWidth="1.5" strokeDasharray="4 3" />
-            <text x={lx} y={ly} textAnchor="middle" dominantBaseline="central" fontSize="9" fill="#e9c349" fontFamily="monospace">MC</text>
+            <line x1={x1} y1={y1} x2={x2} y2={y2} stroke="var(--t-accent)" strokeWidth="1.5" strokeDasharray="4 3" />
+            <text x={lx} y={ly} textAnchor="middle" dominantBaseline="central" fontSize="9" fill="var(--t-accent)" fontFamily="monospace">MC</text>
           </g>
         );
       })()}
@@ -190,7 +190,7 @@ function BalanceBar({ label, count, total, accent }: { label: string; count: num
   return (
     <div className="flex items-center gap-3">
       <span className="font-mono text-[10px] text-on-surface-variant w-20 shrink-0 uppercase tracking-wider">{label}</span>
-      <div className="flex-1 h-2 rounded-full bg-white/5 overflow-hidden">
+      <div className="flex-1 h-2 rounded-full bg-ink-strong/5 overflow-hidden">
         <div className={`h-full rounded-full ${accent}`} style={{ width: `${(count / total) * 100}%` }} />
       </div>
       <span className="font-mono text-[10px] text-on-background w-6 text-right">{count}</span>
@@ -324,7 +324,7 @@ export default function NatalChart() {
               value={birthDate}
               onChange={(e) => setBirthDate(e.target.value)}
               required
-              className="w-full px-4 py-3 bg-brand-void/60 border border-white/10 rounded-xl font-sans text-sm text-gray-200 outline-none focus:border-brand-gold/50 transition-colors [color-scheme:dark]"
+              className="w-full px-4 py-3 bg-brand-void/60 border border-line rounded-xl font-sans text-sm text-ink outline-none focus:border-brand-gold/50 transition-colors"
             />
           </div>
 
@@ -337,14 +337,14 @@ export default function NatalChart() {
               value={birthTime}
               onChange={(e) => setBirthTime(e.target.value)}
               disabled={!timeKnown}
-              className="w-full px-4 py-3 bg-brand-void/60 border border-white/10 rounded-xl font-sans text-sm text-gray-200 outline-none focus:border-brand-gold/50 transition-colors disabled:opacity-40 [color-scheme:dark]"
+              className="w-full px-4 py-3 bg-brand-void/60 border border-line rounded-xl font-sans text-sm text-ink outline-none focus:border-brand-gold/50 transition-colors disabled:opacity-40"
             />
             <label className="flex items-center gap-2 text-[11px] text-on-surface-variant font-sans cursor-pointer">
               <input
                 type="checkbox"
                 checked={!timeKnown}
                 onChange={(e) => setTimeKnown(!e.target.checked)}
-                className="accent-[#c5a059]"
+                className="accent-[var(--t-accent)]"
               />
               Tôi không rõ giờ sinh (sẽ bỏ qua Cung Mọc &amp; 12 Nhà)
             </label>
@@ -357,7 +357,7 @@ export default function NatalChart() {
             <select
               value={placeName}
               onChange={(e) => setPlaceName(e.target.value)}
-              className="w-full px-4 py-3 bg-brand-void/60 border border-white/10 rounded-xl font-sans text-sm text-gray-200 outline-none focus:border-brand-gold/50 transition-colors"
+              className="w-full px-4 py-3 bg-brand-void/60 border border-line rounded-xl font-sans text-sm text-ink outline-none focus:border-brand-gold/50 transition-colors"
             >
               {birthPlaces.map(p => (
                 <option key={p.name} value={p.name} className="bg-brand-void">{p.name}</option>
@@ -372,7 +372,7 @@ export default function NatalChart() {
             <select
               value={tzOffset}
               onChange={(e) => setTzOffset(Number(e.target.value))}
-              className="w-full px-4 py-3 bg-brand-void/60 border border-white/10 rounded-xl font-sans text-sm text-gray-200 outline-none focus:border-brand-gold/50 transition-colors"
+              className="w-full px-4 py-3 bg-brand-void/60 border border-line rounded-xl font-sans text-sm text-ink outline-none focus:border-brand-gold/50 transition-colors"
             >
               {TZ_OPTIONS.map(tz => (
                 <option key={tz.value} value={tz.value} className="bg-brand-void">{tz.label}</option>
@@ -382,7 +382,7 @@ export default function NatalChart() {
         </div>
 
         {error && (
-          <div className="p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-xs text-red-400 font-sans flex items-center gap-2">
+          <div className="p-3 rounded-xl bg-danger/10 border border-danger/20 text-xs text-danger font-sans flex items-center gap-2">
             <AlertCircle className="w-4 h-4 shrink-0" />
             <span>{error}</span>
           </div>
@@ -435,7 +435,7 @@ export default function NatalChart() {
                     <span className="font-sans text-on-background">
                       <span className="text-brand-gold mr-2">{planets[p.planet].glyph}</span>
                       {planets[p.planet].name}
-                      {p.retrograde && <span className="ml-2 font-mono text-[10px] text-red-400/90">℞ nghịch hành</span>}
+                      {p.retrograde && <span className="ml-2 font-mono text-[10px] text-danger">℞ nghịch hành</span>}
                     </span>
                     <span className="font-mono text-xs text-on-surface-variant">
                       {signs[p.sign].glyph} {signs[p.sign].name} {formatDegree(p.degreeInSign)}
@@ -443,8 +443,8 @@ export default function NatalChart() {
                     </span>
                   </div>
                 ))}
-                <div className="flex items-center justify-between py-2 px-3 rounded-lg bg-brand-violet/5 border border-purple-400/20 text-sm">
-                  <span className="font-sans text-purple-300 font-semibold">☊ Bắc Giao Điểm</span>
+                <div className="flex items-center justify-between py-2 px-3 rounded-lg bg-brand-violet/5 border border-accent-2/20 text-sm">
+                  <span className="font-sans text-accent-2 font-semibold">☊ Bắc Giao Điểm</span>
                   <span className="font-mono text-xs text-on-background">
                     {signs[chart.northNode.sign].glyph} {signs[chart.northNode.sign].name} {formatDegree(chart.northNode.degreeInSign)}
                     {chart.northNode.house ? ` · Nhà ${chart.northNode.house}` : ''}
@@ -485,16 +485,16 @@ export default function NatalChart() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                   <div className="space-y-3">
                     <h4 className="font-mono text-xs text-brand-gold tracking-widest uppercase font-bold">Cân bằng Nguyên Tố</h4>
-                    <BalanceBar label="🔥 Lửa" count={analysis.elementCounts['Lửa']} total={10} accent="bg-red-400/80" />
-                    <BalanceBar label="🌍 Đất" count={analysis.elementCounts['Đất']} total={10} accent="bg-amber-600/80" />
-                    <BalanceBar label="💨 Khí" count={analysis.elementCounts['Khí']} total={10} accent="bg-cyan-400/80" />
-                    <BalanceBar label="🌊 Nước" count={analysis.elementCounts['Nước']} total={10} accent="bg-blue-400/80" />
+                    <BalanceBar label="🔥 Lửa" count={analysis.elementCounts['Lửa']} total={10} accent="bg-danger/80" />
+                    <BalanceBar label="🌍 Đất" count={analysis.elementCounts['Đất']} total={10} accent="bg-warning/80" />
+                    <BalanceBar label="💨 Khí" count={analysis.elementCounts['Khí']} total={10} accent="bg-accent-2/80" />
+                    <BalanceBar label="🌊 Nước" count={analysis.elementCounts['Nước']} total={10} accent="bg-accent-2/80" />
                   </div>
                   <div className="space-y-3">
                     <h4 className="font-mono text-xs text-brand-gold tracking-widest uppercase font-bold">Cân bằng Thể Thức</h4>
                     <BalanceBar label="Tiên phong" count={analysis.modalityCounts['Tiên phong']} total={10} accent="bg-brand-gold/80" />
-                    <BalanceBar label="Kiên định" count={analysis.modalityCounts['Kiên định']} total={10} accent="bg-emerald-400/80" />
-                    <BalanceBar label="Linh hoạt" count={analysis.modalityCounts['Linh hoạt']} total={10} accent="bg-violet-400/80" />
+                    <BalanceBar label="Kiên định" count={analysis.modalityCounts['Kiên định']} total={10} accent="bg-success/80" />
+                    <BalanceBar label="Linh hoạt" count={analysis.modalityCounts['Linh hoạt']} total={10} accent="bg-accent-2/80" />
                   </div>
                 </div>
 
@@ -503,7 +503,7 @@ export default function NatalChart() {
                     <p key={e}><span className="text-brand-gold font-semibold">Nguyên tố {e} chiếm ưu thế ({analysis.elementCounts[e]}/10):</span> {elementReadings[e].dominant}</p>
                   ))}
                   {analysis.lackingElements.map(e => (
-                    <p key={e}><span className="text-red-400/90 font-semibold">Thiếu vắng nguyên tố {e}:</span> {elementReadings[e].lacking}</p>
+                    <p key={e}><span className="text-danger font-semibold">Thiếu vắng nguyên tố {e}:</span> {elementReadings[e].lacking}</p>
                   ))}
                   {analysis.dominantModalities.map(m => (
                     <p key={m}><span className="text-brand-cyan font-semibold">Thể thức {m} dẫn dắt ({analysis.modalityCounts[m]}/10):</span> {modalityReadings[m].dominant}</p>
@@ -524,8 +524,8 @@ export default function NatalChart() {
 
                 {/* Stelliums */}
                 {analysis.stelliums.map(([signId, planetIds]) => (
-                  <div key={signId} className="p-4 rounded-2xl bg-brand-violet/5 border border-purple-400/20 text-sm font-sans leading-relaxed space-y-1">
-                    <span className="font-mono text-[10px] text-purple-300 tracking-widest uppercase font-bold block">
+                  <div key={signId} className="p-4 rounded-2xl bg-brand-violet/5 border border-accent-2/20 text-sm font-sans leading-relaxed space-y-1">
+                    <span className="font-mono text-[10px] text-accent-2 tracking-widest uppercase font-bold block">
                       ✨ Stellium tại {signs[signId].name} ({planetIds.map(p => planets[p].name).join(', ')})
                     </span>
                     <p className="text-on-background">{stelliumTemplate} Với bạn, vùng hội tụ ấy mang trọn màu sắc {signs[signId].name}: {signs[signId].traits}</p>
@@ -535,7 +535,7 @@ export default function NatalChart() {
                 {/* Retrogrades */}
                 {analysis.retros.length > 0 && (
                   <div className="space-y-2 text-sm font-sans leading-relaxed">
-                    <h4 className="font-mono text-xs text-red-400/90 tracking-widest uppercase font-bold">℞ Hành tinh nghịch hành lúc chào đời ({analysis.retros.length})</h4>
+                    <h4 className="font-mono text-xs text-danger tracking-widest uppercase font-bold">℞ Hành tinh nghịch hành lúc chào đời ({analysis.retros.length})</h4>
                     {analysis.retros.map(p => (
                       <p key={p.planet} className="text-on-background">
                         <span className="text-brand-gold font-semibold">{planets[p.planet].glyph} {planets[p.planet].name} ℞:</span>{' '}
@@ -607,9 +607,9 @@ export default function NatalChart() {
                   >
                     <p>{inSign.description}</p>
                     <p><span className="text-brand-gold font-semibold">Điểm sáng:</span> {inSign.strengths}</p>
-                    <p><span className="text-red-400/90 font-semibold">Vùng tối:</span> {inSign.challenges}</p>
+                    <p><span className="text-danger font-semibold">Vùng tối:</span> {inSign.challenges}</p>
                     {p.retrograde && (
-                      <p><span className="text-red-400/90 font-semibold">℞ Nghịch hành:</span> {retrogradeReadings[p.planet as keyof typeof retrogradeReadings]}</p>
+                      <p><span className="text-danger font-semibold">℞ Nghịch hành:</span> {retrogradeReadings[p.planet as keyof typeof retrogradeReadings]}</p>
                     )}
                     {inHouse && (
                       <div className="border-t border-brand-gold/10 pt-3 space-y-2">
@@ -630,7 +630,7 @@ export default function NatalChart() {
                 >
                   <div className="space-y-4">
                     {chart.aspects.map((a, i) => (
-                      <div key={i} className="space-y-1 border-b border-white/5 pb-3 last:border-0">
+                      <div key={i} className="space-y-1 border-b border-line pb-3 last:border-0">
                         <p className="font-semibold text-on-background">
                           <span className="text-brand-gold">{planets[a.planetA].glyph} {planets[a.planetA].name}</span>
                           <span className="text-on-surface-variant font-mono text-xs mx-2">

@@ -63,7 +63,7 @@ export default function TarotEncyclopedia() {
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-on-surface-variant/70 group-focus-within:text-brand-cyan transition-colors" />
           <input
             type="text"
-            className="w-full bg-brand-purple/20 border border-outline/30 focus:border-brand-cyan focus:ring-1 focus:ring-brand-cyan/30 text-on-background placeholder-on-surface-variant/50 font-sans text-sm px-12 py-3.5 rounded-xl backdrop-blur-md outline-none transition-all"
+            className="w-full bg-brand-purple/20 border border-line focus:border-brand-cyan focus:ring-1 focus:ring-brand-cyan/30 text-on-background placeholder-on-surface-variant/50 font-sans text-sm px-12 py-3.5 rounded-xl backdrop-blur-md outline-none transition-all"
             placeholder="Tìm kiếm lá bài (ví dụ: Pháp Sư, Lovers)..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
@@ -71,7 +71,7 @@ export default function TarotEncyclopedia() {
           {searchQuery && (
             <button
               onClick={() => setSearchQuery('')}
-              className="absolute right-4 top-1/2 -translate-y-1/2 text-on-surface-variant hover:text-white transition-colors"
+              className="absolute right-4 top-1/2 -translate-y-1/2 text-on-surface-variant hover:text-ink-strong transition-colors"
             >
               <X className="w-4 h-4" />
             </button>
@@ -89,7 +89,7 @@ export default function TarotEncyclopedia() {
             className={`px-5 py-2.5 rounded-full border text-xs font-mono tracking-wider whitespace-nowrap transition-all duration-300 ${
               activeFilter === cat
                 ? 'border-brand-gold text-brand-gold bg-brand-gold/10 shadow-[0_0_15px_rgba(233,195,73,0.15)] font-semibold'
-                : 'border-outline/30 text-on-surface-variant hover:border-brand-cyan hover:text-brand-cyan hover:bg-brand-cyan/5'
+                : 'border-line text-on-surface-variant hover:border-brand-cyan hover:text-brand-cyan hover:bg-brand-cyan/5'
             }`}
           >
             {getFilterLabel(cat)}
@@ -129,7 +129,7 @@ export default function TarotEncyclopedia() {
                 <span className="font-mono text-[10px] text-brand-cyan tracking-wider block mb-1">
                   {card.number} · {card.group === 'Major Arcana' ? 'Ẩn Chính' : 'Ẩn Phụ'}
                 </span>
-                <h3 className="font-serif text-lg text-brand-gold font-bold line-clamp-1 group-hover:text-white transition-colors duration-300">
+                <h3 className="font-serif text-lg text-brand-gold font-bold line-clamp-1 group-hover:text-ink-strong transition-colors duration-300">
                   {card.name}
                 </h3>
                 <p className="font-mono text-[11px] text-on-surface-variant italic line-clamp-1">
@@ -174,7 +174,7 @@ export default function TarotEncyclopedia() {
               {/* Close button */}
               <button
                 onClick={() => setSelectedCard(null)}
-                className="absolute top-4 right-4 z-30 p-2 text-on-surface-variant hover:text-white bg-brand-purple/40 hover:bg-brand-purple/70 rounded-full transition-colors"
+                className="absolute top-4 right-4 z-30 p-2 text-on-surface-variant hover:text-ink-strong bg-brand-purple/40 hover:bg-brand-purple/70 rounded-full transition-colors"
                 aria-label="Đóng bảng chi tiết"
               >
                 <X className="w-5 h-5" />
@@ -232,8 +232,8 @@ export default function TarotEncyclopedia() {
 
                         {/* Upright & Reversed dual column */}
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                          <div className="p-3.5 rounded-xl bg-green-500/5 border border-green-500/20">
-                            <h4 className="font-mono text-xs text-green-400 tracking-wider flex items-center gap-1.5 mb-1.5 uppercase font-semibold">
+                          <div className="p-3.5 rounded-xl bg-success/5 border border-success/20">
+                            <h4 className="font-mono text-xs text-success tracking-wider flex items-center gap-1.5 mb-1.5 uppercase font-semibold">
                               <CheckCircle className="w-3.5 h-3.5" />
                               Nghĩa xuôi
                             </h4>
@@ -241,8 +241,8 @@ export default function TarotEncyclopedia() {
                               {selectedCard.upright}
                             </p>
                           </div>
-                          <div className="p-3.5 rounded-xl bg-red-500/5 border border-red-500/20">
-                            <h4 className="font-mono text-xs text-red-400 tracking-wider flex items-center gap-1.5 mb-1.5 uppercase font-semibold">
+                          <div className="p-3.5 rounded-xl bg-danger/5 border border-danger/20">
+                            <h4 className="font-mono text-xs text-danger tracking-wider flex items-center gap-1.5 mb-1.5 uppercase font-semibold">
                               <AlertTriangle className="w-3.5 h-3.5" />
                               Nghĩa ngược
                             </h4>

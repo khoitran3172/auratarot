@@ -5,6 +5,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content="Aura Tarot — Trải bài Tarot, dự báo cung hoàng đạo và nhật ký tâm linh." />
     <title>Aura Tarot</title>
+    <script>
+      // Apply the stored visual direction before first paint so the page never
+      // flashes the default theme. Kept inline and dependency-free on purpose.
+      (function () {
+        try {
+          var t = localStorage.getItem('aura_theme');
+          document.documentElement.dataset.theme =
+            t === 'obsidian' || t === 'parchment' || t === 'nocturne' ? t : 'obsidian';
+        } catch (e) {
+          document.documentElement.dataset.theme = 'obsidian';
+        }
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>

@@ -32,17 +32,17 @@ type Relation = 'self' | 'trine' | 'opposite' | undefined;
 /** Chính tinh tô theo ngũ hành (quy ước cổ); phụ tinh tô theo cát–hung để dễ quét mắt */
 function starColor(st: StarInstance): string {
   if (st.kind === 'chinh_tinh') return `${st.element ? ELEMENT_COLOR[st.element] : 'text-brand-gold'} font-bold`;
-  if (st.kind === 'dao_hoa') return 'text-pink-300/90';
-  if (st.kind === 'phu_tinh') return st.nature === 'hung' ? 'text-red-400/90' : 'text-amber-200/90';
+  if (st.kind === 'dao_hoa') return 'text-accent-2';
+  if (st.kind === 'phu_tinh') return st.nature === 'hung' ? 'text-danger' : 'text-warning';
   // vòng sao lưu niên
-  if (st.nature === 'hung') return 'text-red-300/50';
-  if (st.nature === 'cat') return 'text-emerald-300/60';
-  return 'text-slate-400/50';
+  if (st.nature === 'hung') return 'text-danger';
+  if (st.nature === 'cat') return 'text-success';
+  return 'text-ink-muted';
 }
 
 function hoaBadge(t: NonNullable<StarInstance['transformation']>): string {
   return t === 'ky'
-    ? 'bg-red-500/25 text-red-200 border-red-400/40'
+    ? 'bg-danger/25 text-danger border-danger/40'
     : 'bg-brand-cyan/20 text-brand-cyan border-brand-cyan/40';
 }
 
@@ -90,7 +90,7 @@ function PalaceCell({
 
   const ringClass =
     relation === 'self' ? 'ring-2 ring-brand-gold z-20'
-    : relation === 'opposite' ? 'ring-1 ring-red-400/60 z-10'
+    : relation === 'opposite' ? 'ring-1 ring-danger z-10'
     : relation === 'trine' ? 'ring-1 ring-brand-cyan/60 z-10'
     : '';
 
@@ -101,13 +101,13 @@ function PalaceCell({
       className={`relative text-left border border-brand-gold/15 hover:border-brand-gold/60 bg-brand-purple/5 hover:bg-brand-gold/[0.06] transition-colors p-1.5 md:p-2 pt-4 overflow-hidden flex flex-col cursor-pointer ${ringClass}`}
     >
       {/* Dải Tuần / Triệt chạy dọc mép trên — cổ lệ vẽ kẹp giữa hai cung */}
-      {palace.hasTuan && <span className="absolute top-0 left-0 w-full h-[3px] bg-violet-400/70" />}
-      {palace.hasTriet && <span className={`absolute ${palace.hasTuan ? 'top-[3px]' : 'top-0'} left-0 w-full h-[3px] bg-red-500/70`} />}
+      {palace.hasTuan && <span className="absolute top-0 left-0 w-full h-[3px] bg-accent-2/70" />}
+      {palace.hasTriet && <span className={`absolute ${palace.hasTuan ? 'top-[3px]' : 'top-0'} left-0 w-full h-[3px] bg-danger/70`} />}
 
       {/* Góc trên-trái: nhãn Tuần/Triệt · Góc trên-phải: đại hạn */}
       <div className="absolute top-1 left-1.5 flex gap-1">
-        {palace.hasTuan && <span className="text-[6px] md:text-[7px] font-mono text-violet-300">TUẦN</span>}
-        {palace.hasTriet && <span className="text-[6px] md:text-[7px] font-mono text-red-300">TRIỆT</span>}
+        {palace.hasTuan && <span className="text-[6px] md:text-[7px] font-mono text-accent-2">TUẦN</span>}
+        {palace.hasTriet && <span className="text-[6px] md:text-[7px] font-mono text-danger">TRIỆT</span>}
       </div>
       <span className={`absolute top-1 right-1.5 text-[7px] md:text-[8px] font-mono ${isCurrentMajor ? 'text-brand-gold font-bold' : 'text-on-surface-variant/60'}`}>
         {palace.majorPeriod.fromAge}–{palace.majorPeriod.toAge}
@@ -147,11 +147,11 @@ function PalaceCell({
       {/* Mép dưới: tên cung · can chi · Trường Sinh · tiểu hạn · điểm */}
       <div className="mt-1 pt-1 border-t border-brand-gold/10 space-y-0.5">
         {truongSinh && (
-          <div className="text-[7px] md:text-[8px] font-mono text-slate-400/70">{truongSinh.name}</div>
+          <div className="text-[7px] md:text-[8px] font-mono text-ink-muted">{truongSinh.name}</div>
         )}
         <div className="flex items-end justify-between gap-1">
           <div className="leading-none min-w-0">
-            <div className="font-serif text-[10px] md:text-xs text-white font-bold flex items-center gap-1 truncate">
+            <div className="font-serif text-[10px] md:text-xs text-ink-strong font-bold flex items-center gap-1 truncate">
               {palace.name}
               {palace.isBody && <span className="text-[6px] md:text-[7px] text-brand-cyan border border-brand-cyan/40 px-0.5 rounded shrink-0">THÂN</span>}
             </div>
@@ -228,21 +228,21 @@ export default function TuViChart() {
               <User className="w-3.5 h-3.5" /> Họ tên
             </label>
             <input type="text" value={personName} onChange={e => setPersonName(e.target.value)} placeholder="Không bắt buộc" maxLength={40}
-              className="w-full px-4 py-3 bg-brand-void/60 border border-white/10 rounded-xl font-sans text-sm text-gray-200 outline-none focus:border-brand-gold/50 transition-colors placeholder:text-gray-600" />
+              className="w-full px-4 py-3 bg-brand-void/60 border border-line rounded-xl font-sans text-sm text-ink outline-none focus:border-brand-gold/50 transition-colors placeholder:text-ink-subtle" />
           </div>
           <div className="space-y-2">
             <label className="font-mono text-xs text-brand-gold tracking-wider uppercase font-semibold flex items-center gap-1.5">
               <CalendarDays className="w-3.5 h-3.5" /> Ngày sinh (DL)
             </label>
             <input type="date" value={birthDate} onChange={e => setBirthDate(e.target.value)} required
-              className="w-full px-4 py-3 bg-brand-void/60 border border-white/10 rounded-xl font-sans text-sm text-gray-200 outline-none focus:border-brand-gold/50 transition-colors [color-scheme:dark]" />
+              className="w-full px-4 py-3 bg-brand-void/60 border border-line rounded-xl font-sans text-sm text-ink outline-none focus:border-brand-gold/50 transition-colors" />
           </div>
           <div className="space-y-2">
             <label className="font-mono text-xs text-brand-gold tracking-wider uppercase font-semibold flex items-center gap-1.5">
               <Clock3 className="w-3.5 h-3.5" /> Giờ sinh
             </label>
             <select value={hour} onChange={e => setHour(Number(e.target.value))}
-              className="w-full px-4 py-3 bg-brand-void/60 border border-white/10 rounded-xl font-sans text-sm text-gray-200 outline-none focus:border-brand-gold/50 transition-colors">
+              className="w-full px-4 py-3 bg-brand-void/60 border border-line rounded-xl font-sans text-sm text-ink outline-none focus:border-brand-gold/50 transition-colors">
               {HOURS.map(h => <option key={h.value} value={h.value} className="bg-brand-void">{h.label}</option>)}
             </select>
           </div>
@@ -253,7 +253,7 @@ export default function TuViChart() {
             <div className="grid grid-cols-2 gap-2">
               {(['nam', 'nu'] as const).map(g => (
                 <button key={g} type="button" onClick={() => setGender(g)}
-                  className={`py-3 rounded-xl border text-sm font-sans transition-all cursor-pointer ${gender === g ? 'border-brand-gold text-brand-gold bg-brand-gold/10 font-bold' : 'border-white/10 text-gray-400 hover:text-white'}`}>
+                  className={`py-3 rounded-xl border text-sm font-sans transition-all cursor-pointer ${gender === g ? 'border-brand-gold text-brand-gold bg-brand-gold/10 font-bold' : 'border-line text-ink-muted hover:text-ink-strong'}`}>
                   {g === 'nam' ? 'Nam' : 'Nữ'}
                 </button>
               ))}
@@ -261,7 +261,7 @@ export default function TuViChart() {
           </div>
         </div>
         {error && (
-          <div className="p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-xs text-red-400 font-sans flex items-center gap-2">
+          <div className="p-3 rounded-xl bg-danger/10 border border-danger/20 text-xs text-danger font-sans flex items-center gap-2">
             <AlertCircle className="w-4 h-4 shrink-0" /><span>{error}</span>
           </div>
         )}
@@ -285,12 +285,12 @@ export default function TuViChart() {
               <div className="flex flex-wrap items-center gap-2.5 text-[9px] md:text-[10px] font-mono text-on-surface-variant">
                 <span className="text-brand-gold">★ điểm cung</span>
                 <span>·</span>
-                <span className="text-amber-200">cát tinh</span>
-                <span className="text-red-400">sát tinh</span>
-                <span className="text-pink-300">đào hoa</span>
+                <span className="text-warning">cát tinh</span>
+                <span className="text-danger">sát tinh</span>
+                <span className="text-accent-2">đào hoa</span>
                 <span>·</span>
-                <span className="text-violet-300">Tuần</span>
-                <span className="text-red-300">Triệt</span>
+                <span className="text-accent-2">Tuần</span>
+                <span className="text-danger">Triệt</span>
               </div>
               <button onClick={() => setShowRings(v => !v)}
                 className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-brand-gold/25 text-[10px] font-mono text-brand-gold hover:bg-brand-gold/10 transition-colors cursor-pointer">
@@ -360,7 +360,7 @@ export default function TuViChart() {
                     <div className="flex flex-wrap gap-1.5">
                       {sec.tags.map((t, i) => (
                         <span key={i} className={`text-[11px] font-sans px-2.5 py-1 rounded-full border ${
-                          t.type === 'hung' ? 'border-red-400/30 bg-red-500/10 text-red-300'
+                          t.type === 'hung' ? 'border-danger/30 bg-danger/10 text-danger'
                           : t.type === 'cat' ? 'border-brand-gold/30 bg-brand-gold/10 text-brand-gold'
                           : 'border-brand-cyan/30 bg-brand-cyan/10 text-brand-cyan'
                         }`}>{t.label}</span>
@@ -378,10 +378,10 @@ export default function TuViChart() {
                     <div className="space-y-3 pt-1">
                       {reading.cachCuc.map(cc => (
                         <div key={cc.id} className={`rounded-xl border p-4 space-y-1.5 ${
-                          cc.type === 'cat' ? 'border-brand-gold/25 bg-brand-gold/[0.04]' : 'border-red-400/25 bg-red-500/[0.04]'
+                          cc.type === 'cat' ? 'border-brand-gold/25 bg-brand-gold/[0.04]' : 'border-danger/25 bg-danger/[0.04]'
                         }`}>
                           <div className="flex items-baseline justify-between gap-2 flex-wrap">
-                            <h5 className={`font-serif text-base font-bold ${cc.type === 'cat' ? 'text-brand-gold' : 'text-red-300'}`}>
+                            <h5 className={`font-serif text-base font-bold ${cc.type === 'cat' ? 'text-brand-gold' : 'text-danger'}`}>
                               {cc.type === 'cat' ? '⚜️' : '⚠️'} {cc.name}
                             </h5>
                             <span className="font-mono text-[10px] text-on-surface-variant">hiện ở {cc.where}</span>
@@ -389,7 +389,7 @@ export default function TuViChart() {
                           <p className="text-[11px] font-mono text-on-surface-variant/80">{cc.condition}</p>
                           <p className="text-sm text-on-background leading-relaxed">{cc.meaning}</p>
                           {cc.broken && (
-                            <p className="text-sm text-amber-300/90 leading-relaxed border-l-2 border-amber-400/40 pl-2.5">
+                            <p className="text-sm text-warning leading-relaxed border-l-2 border-warning/40 pl-2.5">
                               <strong>Điều kiện phá cách:</strong> {cc.broken}
                             </p>
                           )}
@@ -429,7 +429,7 @@ export default function TuViChart() {
                     <span className="font-mono text-xs text-on-surface-variant">{selected.score.score100}/100 · {selected.score.label}</span>
                   </h4>
                 </div>
-                <button onClick={() => setSelected(null)} className="p-2 text-on-surface-variant hover:text-white bg-brand-purple/40 rounded-full transition-colors outline-none shrink-0">
+                <button onClick={() => setSelected(null)} className="p-2 text-on-surface-variant hover:text-ink-strong bg-brand-purple/40 rounded-full transition-colors outline-none shrink-0">
                   <X className="w-5 h-5" />
                 </button>
               </div>
@@ -442,7 +442,7 @@ export default function TuViChart() {
                     return (
                       <span key={i} title={m?.essence || ''}
                         className={`text-[11px] font-sans px-2 py-1 rounded-lg border ${
-                          st.kind === 'chinh_tinh' ? 'border-brand-gold/40 bg-brand-gold/10' : 'border-white/10 bg-brand-purple/10'
+                          st.kind === 'chinh_tinh' ? 'border-brand-gold/40 bg-brand-gold/10' : 'border-line bg-brand-purple/10'
                         } ${starColor(st)}`}>
                         {st.name}
                         {st.brightness && <span className="opacity-70"> · {BRIGHTNESS_NAMES[st.brightness]}</span>}

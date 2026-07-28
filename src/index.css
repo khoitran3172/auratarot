@@ -1,71 +1,293 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Space+Grotesk:wght@400;500;600;700&display=swap');
-@import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Cormorant+Garamond:ital,wght@0,300..700;1,300..700&family=Space+Grotesk:wght@400;500;600;700&display=swap');
+@import 'tailwindcss';
+@import './styles/themes.css';
 
-@theme {
-  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
-  --font-serif: "Playfair Display", Georgia, serif;
-  --font-mono: "Space Grotesk", ui-monospace, SFMono-Regular, monospace;
+/**
+ * Semantic design tokens.
+ *
+ * `inline` is load-bearing: it makes each utility emit `var(--t-…)` directly
+ * instead of a copy of the value, so overriding a raw variable on
+ * `[data-theme]` re-themes every utility live. Without it, switching
+ * directions at runtime would not propagate.
+ *
+ * Rule for components: use the SEMANTIC names below. Never `--t-*`, never a
+ * raw hex, never a Tailwind palette colour (`text-white`, `bg-red-500`) —
+ * those are invisible to theming and are what broke the previous palette.
+ */
+@theme inline {
+  /* ---- Surfaces ---- */
+  --color-bg: var(--t-bg);
+  --color-bg-elevated: var(--t-bg-elevated);
+  --color-surface: var(--t-surface);
+  --color-surface-2: var(--t-surface-2);
+  --color-surface-3: var(--t-surface-3);
 
-  /* Custom palette colors for Editorial Aesthetic */
-  --color-brand-void: #050515;
-  --color-brand-purple: #0f0f2d;
-  --color-brand-gold: #C5A059;
-  --color-brand-cyan: #8a2be2;
-  --color-brand-violet: #8a2be2;
-  --color-surface-container: #101026;
-  --color-surface-bright: #252542;
+  /* ---- Text ("ink") ---- */
+  --color-ink-strong: var(--t-text-strong);
+  --color-ink: var(--t-text);
+  --color-ink-muted: var(--t-text-muted);
+  --color-ink-subtle: var(--t-text-subtle);
+
+  /* ---- Accents ---- */
+  --color-accent: var(--t-accent);
+  --color-accent-strong: var(--t-accent-strong);
+  --color-accent-contrast: var(--t-accent-contrast);
+  --color-accent-2: var(--t-accent-2);
+  --color-accent-2-contrast: var(--t-accent-2-contrast);
+
+  /* ---- Status ---- */
+  --color-danger: var(--t-danger);
+  --color-success: var(--t-success);
+  --color-warning: var(--t-warning);
+
+  /* ---- Lines & focus ---- */
+  --color-line: var(--t-line);
+  --color-line-strong: var(--t-line-strong);
+  --color-focus: var(--t-focus);
+
+  /* ----------------------------------------------------------------------
+     Legacy aliases.
+     The 7 feature screens (~4000 lines) still use these names. Mapping them
+     onto the semantic layer does two things at once: it repairs the classes
+     that referenced tokens which were never defined (`on-background`,
+     `on-surface`, `on-surface-variant`, `brand-magenta` — 106 dead classes),
+     and it makes every existing screen theme-aware with no edits.
+     Migrate screens onto the semantic names, then delete this block.
+     ---------------------------------------------------------------------- */
+  --color-brand-void: var(--t-bg);
+  --color-brand-purple: var(--t-surface-2);
+  --color-brand-gold: var(--t-accent);
+  --color-brand-cyan: var(--t-accent-2);
+  --color-brand-violet: var(--t-accent-2);
+  --color-brand-magenta: var(--t-accent-2);
+  --color-surface-container: var(--t-surface);
+  --color-surface-bright: var(--t-surface-2);
+  --color-on-background: var(--t-text);
+  --color-on-surface: var(--t-text-strong);
+  --color-on-surface-variant: var(--t-text-muted);
+
+  /* ---- Typography ---- */
+  --font-sans: var(--t-font-body);
+  --font-serif: var(--t-font-display);
+  --font-display: var(--t-font-display);
+  --font-mono: var(--t-font-mono);
+
+  --tracking-display: var(--t-display-tracking);
+  --tracking-eyebrow: var(--t-eyebrow-tracking);
+
+  --text-display-sm: 1.5rem;
+  --text-display-sm--line-height: 1.25;
+  --text-display-md: 2rem;
+  --text-display-md--line-height: 1.18;
+  --text-display-lg: 2.75rem;
+  --text-display-lg--line-height: 1.1;
+  --text-display-xl: 3.75rem;
+  --text-display-xl--line-height: 1.04;
+
+  /* ---- Shape. Overriding Tailwind's defaults on purpose: existing screens
+     already use rounded-xl / rounded-2xl / rounded-3xl everywhere, so this
+     puts them under theme control for free. ---- */
+  --radius-sm: var(--t-radius-sm);
+  --radius-md: var(--t-radius-md);
+  --radius-lg: var(--t-radius-lg);
+  --radius-xl: var(--t-radius-xl);
+  --radius-2xl: var(--t-radius-2xl);
+  --radius-3xl: calc(var(--t-radius-2xl) * 1.35);
+
+  /* ---- Elevation ---- */
+  --shadow-card: var(--t-card-shadow);
+  --shadow-raised: var(--t-raised-shadow);
+  --shadow-glow: var(--t-glow-accent);
+
+  /* ---- Motion ---- */
+  --ease-out-soft: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-spring: cubic-bezier(0.175, 0.885, 0.32, 1.2);
 }
 
-/* Base custom classes for Aura Tarot */
+/* ==========================================================================
+   Base
+   ========================================================================== */
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    background-color: var(--t-bg);
+    /* Keeps the fixed header from covering anchored content. */
+    scroll-padding-top: 5.5rem;
+  }
 
-.glass-card {
-  background: rgba(255, 255, 255, 0.03);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(197, 160, 89, 0.15);
+  body {
+    font-family: var(--t-font-body);
+    background-color: var(--t-bg);
+    background-image: var(--t-body-bg-image);
+    background-attachment: fixed;
+    color: var(--t-text);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  /* One visible focus treatment for the whole app. The previous code put
+     `outline-none` on every interactive element with nothing in its place,
+     which left keyboard users with no visible focus at all. */
+  :where(a, button, input, select, textarea, summary, [tabindex]):focus-visible {
+    outline: 2px solid var(--t-focus);
+    outline-offset: 2px;
+    border-radius: var(--t-radius-sm);
+  }
+
+  ::selection {
+    background: color-mix(in oklab, var(--t-accent) 32%, transparent);
+    color: var(--t-text-strong);
+  }
+
+  /* Native pickers (the birth-date inputs) follow the theme via color-scheme
+     on the theme root, so the hardcoded [color-scheme:dark] is no longer
+     needed on individual fields. */
+  input,
+  select,
+  textarea,
+  button {
+    font: inherit;
+    color: inherit;
+  }
 }
 
-.glass-card-cyan {
-  background: rgba(255, 255, 255, 0.03);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(138, 43, 226, 0.15);
+/* ==========================================================================
+   Surface treatments
+   Each direction defines its own card recipe, so these render as glass,
+   printed paper, or flat charcoal with no per-theme branching at the
+   call site.
+   ========================================================================== */
+@utility surface-card {
+  background: var(--t-card-bg);
+  border: var(--t-card-border);
+  box-shadow: var(--t-card-shadow);
+  backdrop-filter: var(--t-card-blur);
+  -webkit-backdrop-filter: var(--t-card-blur);
 }
 
-.gold-glow {
-  box-shadow: 0 0 25px rgba(197, 160, 89, 0.3);
+@utility surface-raised {
+  background: var(--t-card-bg);
+  border: var(--t-card-border);
+  box-shadow: var(--t-raised-shadow);
+  backdrop-filter: var(--t-card-blur);
+  -webkit-backdrop-filter: var(--t-card-blur);
 }
 
-.cyan-glow {
-  box-shadow: 0 0 25px rgba(138, 43, 226, 0.2);
+@utility surface-sunken {
+  background: var(--t-surface-3);
+  border: 1px solid var(--t-line);
 }
 
-.perspective-1000 {
+/* Floating panels — menus, popovers, dialogs. Deliberately opaque: the glass
+   recipe let page content read through a floating panel and made its text
+   unreadable. */
+@utility surface-overlay {
+  background: var(--t-overlay-bg);
+  border: var(--t-card-border);
+  box-shadow: var(--t-raised-shadow);
+}
+
+/* Legacy names kept so the existing screens keep rendering during migration. */
+@utility glass-card {
+  background: var(--t-card-bg);
+  border: var(--t-card-border);
+  box-shadow: var(--t-card-shadow);
+  backdrop-filter: var(--t-card-blur);
+  -webkit-backdrop-filter: var(--t-card-blur);
+}
+
+@utility glass-card-cyan {
+  background: var(--t-card-bg);
+  border: 1px solid color-mix(in oklab, var(--t-accent-2) 22%, transparent);
+  box-shadow: var(--t-card-shadow);
+  backdrop-filter: var(--t-card-blur);
+  -webkit-backdrop-filter: var(--t-card-blur);
+}
+
+@utility gold-glow {
+  box-shadow: var(--t-glow-accent);
+}
+
+@utility cyan-glow {
+  box-shadow: var(--t-glow-accent);
+}
+
+/* ==========================================================================
+   Text roles
+   ========================================================================== */
+@utility eyebrow {
+  font-family: var(--t-font-mono);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: var(--t-eyebrow-tracking);
+  text-transform: uppercase;
+  color: var(--t-accent);
+}
+
+@utility display-title {
+  font-family: var(--t-font-display);
+  letter-spacing: var(--t-display-tracking);
+  color: var(--t-text-strong);
+}
+
+/* Caps long interpretation copy at a comfortable measure. Full-width prose
+   is the biggest readability problem on the reading screens. */
+@utility prose-measure {
+  max-width: 68ch;
+}
+
+/* ==========================================================================
+   3D card flip (tarot)
+   ========================================================================== */
+@utility perspective-1000 {
   perspective: 1000px;
 }
 
-.backface-hidden {
+@utility backface-hidden {
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
 }
 
-.rotate-y-180 {
+@utility rotate-y-180 {
   transform: rotateY(180deg);
 }
 
-.transform-style-3d {
+@utility transform-style-3d {
   transform-style: preserve-3d;
 }
 
-/* Beautiful custom cubic-bezier elastic spring card flip */
 .card-inner {
-  transition: transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.2);
+  transition: transform 0.8s var(--ease-spring);
 }
 
+/* ==========================================================================
+   Utilities
+   ========================================================================== */
+@utility no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
 
-/* Animations */
+/* Guarantees the 44x44 minimum touch target regardless of icon size. */
+@utility tap-target {
+  min-width: 2.75rem;
+  min-height: 2.75rem;
+}
+
+/* Real safe-area padding. `pb-safe` was being used on the mobile nav but is
+   not a Tailwind class, so it silently did nothing and the bar sat under the
+   home indicator on notched phones. */
+@utility pb-safe {
+  padding-bottom: max(0.375rem, env(safe-area-inset-bottom));
+}
+
 @keyframes float {
-  0%, 100% {
+  0%,
+  100% {
     transform: translateY(0) rotate(0deg);
   }
   50% {
@@ -73,27 +295,46 @@
   }
 }
 
-.tarot-float {
+@utility tarot-float {
   animation: float 6s ease-in-out infinite;
 }
 
-/* Hide scrollbar but keep functionality */
-.no-scrollbar::-webkit-scrollbar {
-  display: none;
-}
-.no-scrollbar {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
+@keyframes shimmer {
+  100% {
+    transform: translateX(100%);
+  }
 }
 
-/* Smooth scrolling */
-html {
-  scroll-behavior: smooth;
-  background-color: #050515;
+/* Skeleton placeholder — the app currently shows a bare spinner while the
+   heavy interpretation datasets load. */
+@utility skeleton {
+  position: relative;
+  overflow: hidden;
+  background: color-mix(in oklab, var(--t-text-strong) 7%, transparent);
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    transform: translateX(-100%);
+    background: linear-gradient(
+      90deg,
+      transparent,
+      color-mix(in oklab, var(--t-text-strong) 9%, transparent),
+      transparent
+    );
+    animation: shimmer 1.6s infinite;
+  }
 }
 
-body {
-  font-family: var(--font-sans);
-  background-color: #050515;
-  color: #E0E0E0;
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }
