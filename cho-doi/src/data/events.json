@@ -1,0 +1,41 @@
+{
+  "gangsters": {
+    "anhhai": {
+      "name": "Anh Hai Dây Chuyền",
+      "look": { "bodyColor": "#111111", "hat": "none", "chain": true },
+      "arrive": [
+        "Ê {xung}, tới ngày rồi nha. Phí trông sạp hai chục, anh Hai trông kỹ lắm à.",
+        "Chợ này anh Hai trông, mưa không ướt nắng không phai. Hai chục nha {xung}.",
+        "Hôm nay {xung} bán đắt hông? Đắt thì đưa anh hai chục, ế thì... cũng hai chục."
+      ],
+      "options": {
+        "pay": { "label": "Trả đủ 20k", "hint": "-20k, êm chuyện", "react": ["Vậy mới là dân chợ chớ. Mai anh đứng gác cho, khỏi lo!", "Ngoan. Có gì kêu anh Hai nha."] },
+        "praise": { "label": "Khen anh Hai đẹp trai", "hint": "Dẻo miệng ≥ 5 thì chỉ 18k",
+          "success": ["Trời, nói trúng tim đen anh rồi. Thôi lấy mười tám thôi!", "Mắt {xung} tinh dữ ha. Bớt hai ngàn, coi như lì xì."],
+          "fail": ["Khen gì mà nghe như đọc bài vậy {xung}? Đủ hai chục nha.", "Câu này anh nghe cả chục người khen rồi. Hai chục, hông bớt."] },
+        "tea": { "label": "Mời ly trà đá", "hint": "15k + 3k trà đá, Vía +3", "react": ["Trà đá mát ghê. Thôi lấy mười lăm thôi, nể {xung} đó.", "Ờ, uống ly trà nói chuyện cho vui. Mười lăm nha."] },
+        "refuse": { "label": "Không trả", "hint": "Mai anh hát karaoke trước sạp, khách ×0.6", "react": ["Được. Mai anh mang loa kẹo kéo ra đây hát cho {xung} nghe chơi.", "Hông trả hả? Mai nghe anh Hai hát 'Thành phố buồn' cả buổi nha."] }
+      },
+      "karaoke": ["Anh Hai đang ôm loa kẹo kéo hát trước sạp. Khách ngại ghé."]
+    },
+    "utkinhden": {
+      "name": "Út Kính Đen",
+      "look": { "bodyColor": "#333333", "hat": "cap" },
+      "lines": [
+        "Nghe nói có người nợ {xung} hả? Để Út đi đòi giùm, chia ba bảy.",
+        "Ui chời, đụng trúng thúng cà của {xung} rồi. Thôi Út đi nha.",
+        "Út kính đen nè, ai thiếu nợ cứ đưa danh sách."
+      ]
+    }
+  },
+  "loan": {
+    "offer": ["Thấy {xung} kẹt quá, bà Chín cho mượn trăm ngàn. Chiều bán xong trả bà trăm mười, có dư thì trả, chưa có thì để mai.", "Hết vốn hả {xung}? Cầm trăm ngàn của bà đi lấy hàng. Chiều trả bà trăm mười nha."],
+    "repaid": ["Bà Chín nhận lại trăm mười rồi nha. Giỏi lắm.", "Đủ rồi đó {xung}. Mai mốt kẹt cứ kêu bà."],
+    "deferred": ["Chưa đủ thì thôi, mai trả bà cũng được."]
+  },
+  "festival": {
+    "holiday": "Hôm nay {date}. Người ta đi chùa, mua rau cúng đông. Rau muống bán được giá hơn.",
+    "midAutumn": "Rằm tháng Tám — Trung Thu! Chợ treo lồng đèn, con nít chạy rần rần.",
+    "earlyMonth": "Đầu tháng, người ta kiêng trả nợ. Sổ nợ khó đòi mấy bữa này."
+  }
+}

@@ -1,0 +1,144 @@
+{
+  "playerLines": {
+    "accept": ["Dạ, {goi} lấy giá đó đi {goi}.", "Thôi được, {toi} bán mở hàng cho {goi} vui."],
+    "sob": ["Hàng vốn đó {goi} ơi, {toi} lời có chút xíu à.", "Sáng giờ {toi} chưa bán được mấy, {goi} thương {toi} chút đi.", "Đi chợ đầu mối từ ba giờ sáng đó {goi}, bớt nữa là {toi} lỗ."],
+    "flatter": ["{goi} mặc áo này trẻ ra chục tuổi luôn á.", "Nhìn {goi} là biết người rành chợ, mua chỗ {toi} là đúng rồi.", "Bữa nay {goi} tươi dữ vậy, chắc có tin vui hả?"],
+    "onion": ["Thôi {toi} tặng {goi} nắm hành, {goi} thêm chút cho {toi} nha.", "Lấy thêm nắm hành về nấu canh nè {goi}, {toi} cho đó."],
+    "hold": ["Giá này là giá chót rồi {goi}, hàng {toi} tươi nhất dãy.", "Hông bớt được nữa {goi} ơi, {goi} hỏi khắp chợ coi."],
+    "candy": ["Nè, {toi} cho Út cục kẹo nè.", "Út ngoan, cầm cục kẹo nè."],
+    "sell": ["Dạ, {toi} gói cho {goi} liền.", "Dạ, của {goi} đây."],
+    "sellFull": ["Dạ, {toi} bán đúng giá cho bà.", "Dạ, đúng giá nha bà."],
+    "charity": ["Bà mua cúng chùa thì {toi} bớt cho bà làm phước.", "Bà cầm về cúng đi bà, {toi} bớt chút cho có phước."],
+    "upsell": ["Chú ơi, chú hay mua thêm một {unit} nữa mà, chú quên hả?", "Bữa trước chú lấy thêm một {unit} đó chú."],
+    "credit": ["Thôi chú cứ lấy đi, {toi} ghi sổ cho.", "Để {toi} ghi sổ, mai mốt chú trả."],
+    "cash": ["Bữa nay trả tiền mặt giùm {toi} nha chú.", "Sổ dày quá rồi chú ơi, tiền mặt nha chú."]
+  },
+  "customers": {
+    "ba8": {
+      "goi": "bà", "xung": { "m": "con", "f": "con" }, "toi": { "m": "con", "f": "con" },
+      "greet": [
+        "Ê {xung}, {item} bữa nay nhiêu? Bà lấy {qty} {unit}, {price} thôi nha, chợ này bà rành hết.",
+        "Trời ơi {item} gì mắc dữ vậy. Bà lấy {qty} {unit}, đưa {price} đó, chịu thì bán.",
+        "Nè {xung}, bà mua {qty} {unit} {item}. Bán {price} bà đi khen cho cả xóm biết."
+      ],
+      "react": {
+        "accept": { "success": ["Vậy mới được chớ! Để bà đi khen {xung} cho cả chợ biết.", "Sạp này dễ thương ghê, bà đi nói với tụi nó."], "fail": [] },
+        "sob": { "success": ["Thôi được rồi, thấy {xung} cực bà thêm chút.", "Ừ ừ, ai đi chợ đầu mối cũng cực, bà biết mà."], "fail": ["Cực thì ai mà không cực, giá bà đưa đó.", "Bà cũng khổ nè {xung}, giá đó thôi."] },
+        "flatter": { "success": ["Cái miệng {xung} dẻo dữ! Thôi lấy giá {xung} nói.", "Trời, nói vậy bà mắc cỡ. Thôi bà đưa thêm."], "fail": ["Khen thì khen chớ tiền bà hông thêm đâu.", "Nịnh bà hoài, bà biết nghề rồi nha."] },
+        "onion": { "success": ["Có hành nữa hả, vậy bà thêm cho.", "{xung} biết điều ghê, bà đi khen liền."], "fail": [] },
+        "hold": { "success": ["Thôi được rồi, giá đó thì giá đó.", "Cứng dữ ha, bà chịu thua {xung}."], "fail": ["Hông bớt hả? Bà qua sạp khác, rồi bà nói cho cả chợ biết!", "Bán mắc vậy ai mua, bà đi đây."] }
+      },
+      "leave": ["Chờ gì lâu quá, bà đi chỗ khác. Sạp này chậm như rùa!", "Thôi bà hông chờ nữa, để bà đi kể tụi nó nghe."]
+    },
+    "ba6": {
+      "goi": "bà", "xung": { "m": "cháu", "f": "cháu" }, "toi": { "m": "cháu", "f": "cháu" },
+      "greet": [
+        "Để bà coi kỹ đã... {item} này cũng tạm. Bà lấy {qty} {unit}, {price} nha.",
+        "{item} này lựa kỹ chưa {xung}? Bà mua {qty} {unit}, trả {price}.",
+        "Bà hỏi thiệt, {item} có tươi hông đó? {qty} {unit}, {price} thôi."
+      ],
+      "wilted": ["Rau gì héo queo rồi nè {xung}. {qty} bó, bà trả {price} thôi.", "Rau này héo rồi đó, bán rẻ cho bà đi, {price}."],
+      "react": {
+        "accept": { "success": ["Ừ, vậy được. Lần sau lựa đồ tươi hơn nha {xung}.", "Được rồi, gói kỹ cho bà."], "fail": [] },
+        "sob": { "success": ["Thôi được, bà thêm chút cho {xung}.", "Bà cũng thương mấy đứa buôn bán nhỏ."], "fail": ["Khổ thì khổ, hàng phải đúng giá chớ.", "Giá bà đưa vậy là vừa rồi."] },
+        "flatter": { "success": ["Hừm... thôi được, giá {xung} đó.", "Ăn nói được đó, bà thêm cho."], "fail": ["Khen bà làm chi, bà coi hàng chớ hông coi miệng.", "Nịnh hông ăn thua với bà đâu."] },
+        "onion": { "success": ["Có hành hả? Vậy mới được, bà thích sạp này.", "Biết ý bà dữ ha. Lần sau bà ghé nữa."], "fail": [] },
+        "hold": { "success": ["Thôi được, bà mua. Mà hàng phải tốt nha.", "Hàng tốt thì bà chịu giá."], "fail": ["Hông bớt thì thôi, bà đi lựa chỗ khác.", "Mắc quá, bà hông mua."] }
+      },
+      "leave": ["Chờ hoài, bà đi đây.", "Bán chậm quá, thôi bà về."]
+    },
+    "ba7": {
+      "goi": "bà", "xung": { "m": "con", "f": "con" }, "toi": { "m": "con", "f": "con" },
+      "greet": [
+        "A Di Đà Phật. {xung} ơi, bà mua {qty} {unit} {item} về cúng chùa. Nhiêu đó {xung}?",
+        "Bữa nay chùa làm cơm chay, bà lấy {qty} {unit} {item} nha {xung}.",
+        "Bà Bảy nè {xung}. Cho bà {qty} {unit} {item}, giá sao bà trả vậy."
+      ],
+      "react": {
+        "sellFull": { "success": ["Ừ, bà gửi đủ nè. Phật độ cho {xung} buôn may bán đắt.", "Cảm ơn {xung}, bà đi chùa đây."], "fail": [] },
+        "charity": { "success": ["A Di Đà Phật, {xung} có lòng quá. Phước đó con.", "Bớt cho chùa là có phước lắm đó {xung}."], "fail": [] }
+      },
+      "leave": ["Thôi trễ giờ rồi, bà đi chùa trước.", "Bà phải đi kẻo trễ, mai bà ghé."]
+    },
+    "ong6": {
+      "goi": "chú", "xung": { "m": "con", "f": "con" }, "toi": { "m": "con", "f": "con" },
+      "greet": [
+        "Ủa, chú định mua gì ta... à, {qty} {unit} {item}. Nhiêu {xung}?",
+        "Bả dặn mua cái gì mà chú quên rồi... chắc là {item}, {qty} {unit}.",
+        "{item} nè, lấy chú {qty} {unit}. Còn gì nữa hông ta..."
+      ],
+      "react": {
+        "sell": { "success": ["Nè tiền nè. Ủa, thối gì, thôi khỏi thối!", "Cảm ơn {xung}. Mà chú để xe đâu ta..."], "fail": [] },
+        "upsell": { "success": ["À đúng rồi, bả có dặn! May có {xung} nhắc.", "Ờ ha, lấy thêm đi, về khỏi bị la."], "fail": [] }
+      },
+      "leave": ["Ủa chú đứng đây làm gì ta... thôi về.", "Chú quên mất mua gì rồi, để mai."]
+    },
+    "chu8": {
+      "goi": "chú", "xung": { "m": "con", "f": "con" }, "toi": { "m": "con", "f": "con" },
+      "greet": [
+        "Ê {xung}, cho chú {qty} {unit} thịt làm mồi. Ghi sổ nha, cuối tuần chú trả.",
+        "Chiều nay tụi bạn chú tới, lấy chú {qty} {unit} thịt. Ghi sổ giùm chú.",
+        "Lấy chú {qty} {unit} thịt nạc vai nha {xung}. Tiền... ghi sổ đi."
+      ],
+      "react": {
+        "credit": { "success": ["Tốt quá! Cuối tuần chú trả, chú hứa.", "Biết ngay {xung} dễ thương mà."], "fail": [] },
+        "cash": { "success": ["Thôi được, nè tiền nè. Hên là mới lãnh lương.", "Ờ, trả thì trả, cho đẹp mặt."], "fail": ["Hông ghi sổ hả? Thôi chú qua sạp khác.", "Khó dữ vậy, chú đi chỗ khác mua."] }
+      },
+      "leave": ["Thôi chú đi nhậu trước, mai mua.", "Lâu quá, tụi nó chờ chú rồi."]
+    },
+    "anh4": {
+      "goi": "anh", "xung": { "m": "chú em", "f": "cô em" }, "toi": { "m": "em", "f": "em" },
+      "greet": [
+        "Lẹ lẹ giùm anh, {qty} {unit} {item}, {price} nha. Anh có cuốc xe.",
+        "{item} {qty} {unit}, {price}, gói lẹ đi {xung}.",
+        "Mau mau {xung} ơi, khách đang chờ. {qty} {unit} {item}, {price}."
+      ],
+      "react": {
+        "accept": { "success": ["Ngon, anh chạy đây!", "Lẹ vậy mới được, anh ghé hoài."], "fail": [] },
+        "sob": { "success": ["Ờ thôi thêm cho, đừng kể nữa.", "Rồi rồi, nè."], "fail": ["Anh đang gấp mà kể khổ gì! Thôi anh đi.", "Khổ thì ai cũng khổ, anh hông rảnh nghe!"] },
+        "flatter": { "success": ["Ha, chịu {xung} luôn. Thêm nè.", "Nói nghe lọt tai đó."], "fail": ["Khen gì, gói lẹ đi.", "Thôi khỏi khen, giá đó."] },
+        "onion": { "success": ["Có hành hả, ok thêm chút.", "Được, nhanh gọn."], "fail": [] },
+        "hold": { "success": ["Thôi giá đó cũng được, anh hết giờ cò kè.", "Ờ, lấy đi."], "fail": ["Hông bớt thì thôi, anh chạy!", "Mắc vậy, anh đi."] }
+      },
+      "leave": ["Chờ chi lâu vậy, anh chạy đây!", "Mất khách của anh rồi, thôi!"]
+    },
+    "lan": {
+      "goi": "chị", "xung": { "m": "em", "f": "em" }, "toi": { "m": "em", "f": "em" },
+      "greet": [
+        "Em ơi, chị lấy {qty} {unit} {item}, {price} nha. Chị trễ làm rồi.",
+        "{qty} {unit} {item} giùm chị, lẹ nha em. {price} được hông?",
+        "Gói cho chị {qty} {unit} {item}, chị trả {price}, nhanh nha em."
+      ],
+      "react": {
+        "accept": { "success": ["Cảm ơn em, mai chị ghé nữa.", "Ok em, chị đi làm đây."], "fail": [] },
+        "sob": { "success": ["Thôi được, chị thêm chút.", "Ừ, chị biết buôn bán cực."], "fail": ["Thôi giá đó nha em, chị trễ rồi.", "Chị đưa vậy thôi, gói lẹ giùm."] },
+        "flatter": { "success": ["Haha, nói ngọt dữ. Lấy giá em đi.", "Thôi được, thêm cho em."], "fail": ["Cảm ơn em, mà giá đó nha.", "Chị biết rồi, giá chị nói nha."] },
+        "onion": { "success": ["Có hành, vậy đỡ ghé sạp khác. Cảm ơn em!", "Dễ thương quá, chị thêm."], "fail": [] },
+        "hold": { "success": ["Ok, chị hông có thời gian trả giá.", "Thôi được, lấy đi."], "fail": ["Thôi chị đi sạp khác, trễ làm rồi.", "Mắc quá, chị mua chỗ khác."] }
+      },
+      "leave": ["Chị trễ làm rồi, thôi mai nha em!", "Lâu quá em ơi, chị đi trước."]
+    },
+    "ut": {
+      "goi": "Út", "xung": { "m": "anh Hai", "f": "chị Hai" }, "toi": { "m": "anh", "f": "chị" },
+      "greet": [
+        "{xung} ơi, má con dặn mua {qty} {unit} {item}. Má đưa {price} hà.",
+        "Con mua {item} nè {xung}. Con có {price} thôi à.",
+        "{xung} bán con {qty} {unit} {item} nha, tiền nè, {price}."
+      ],
+      "react": {
+        "accept": { "success": ["Dạ con cảm ơn {xung}!", "Hihi, con về khoe má."], "fail": [] },
+        "sob": { "success": ["Dạ... má có đưa dư nè, con đưa thêm.", "Con hông biết nữa, con đưa hết nè."], "fail": ["Con chỉ có nhiêu đó à {xung}...", "Má con đưa nhiêu đó thôi à."] },
+        "flatter": { "success": ["Hihi, con đưa thêm tiền ăn sáng nè.", "Thiệt hả {xung}? Con đưa thêm nè."], "fail": ["Dạ... mà con hết tiền rồi.", "Con chỉ có nhiêu đó thôi."] },
+        "onion": { "success": ["Má con thích hành lắm! Con đưa thêm nè.", "Dạ cảm ơn {xung}!"], "fail": [] },
+        "hold": { "success": ["Dạ... con đưa luôn tiền ăn sáng.", "Dạ, con đưa đủ."], "fail": ["Con hông đủ tiền... thôi con về hỏi má.", "Hu hu, con về đây."] },
+        "candy": { "success": ["Ui kẹo! Con cảm ơn {xung} nhiều!", "Hihi, con thích {xung} nhứt chợ!"], "fail": [] }
+      },
+      "leave": ["Con phải về, má kêu rồi.", "Lâu quá, con về hỏi má."]
+    }
+  },
+  "clearanceGreet": [
+    "Xả hàng hả {xung}? Lấy {qty} {unit} {item} đi, {price} đúng hông?",
+    "Đồng giá rồi đó hả? Cho {qty} {unit} {item}."
+  ],
+  "clearanceThanks": ["Rẻ ghê, mai bán vậy nữa nha!", "Hên quá, về nấu liền."]
+}

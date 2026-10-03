@@ -24,6 +24,9 @@ jobs:
         with:
           node-version: 22
           cache: npm
+          cache-dependency-path: |
+            package-lock.json
+            cho-doi/package-lock.json
 
       - name: Install dependencies
         run: npm ci
@@ -35,6 +38,21 @@ jobs:
 
       - name: SPA fallback
         run: cp dist/index.html dist/404.html
+
+      # Game Chợ Đời: project riêng trong cho-doi/, phục vụ tại aura.id.vn/cho-doi/
+      - name: Install Chợ Đời dependencies
+        run: npm ci
+        working-directory: cho-doi
+
+      - name: Test Chợ Đời
+        run: npx vitest run
+        working-directory: cho-doi
+
+      - name: Build Chợ Đời
+        run: npx tsc --noEmit && npx vite build --outDir ../dist/cho-doi --emptyOutDir
+        working-directory: cho-doi
+        env:
+          BASE_PATH: /cho-doi/
 
       - name: Setup Pages
         uses: actions/configure-pages@v5

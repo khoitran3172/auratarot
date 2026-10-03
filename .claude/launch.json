@@ -4,9 +4,21 @@
     {
       "name": "aura-tarot",
       "runtimeExecutable": "cmd",
-      "runtimeArgs": ["/c", "npx vite --port 3000 --strictPort"],
+      "runtimeArgs": [
+        "/c",
+        "npx vite --port 3000 --strictPort"
+      ],
       "port": 3000,
       "autoPort": true
+    },
+    {
+      "name": "cho-doi",
+      "runtimeExecutable": "cmd",
+      "runtimeArgs": [
+        "/c",
+        "cd cho-doi && npx vite --port 5174 --strictPort"
+      ],
+      "port": 5174
     }
   ]
 }
