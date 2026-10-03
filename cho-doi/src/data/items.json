@@ -1,0 +1,5 @@
+[
+  { "id": "rau", "name": "Rau muống", "unit": "bó", "buy": 5, "sell": 9, "spoilRate": 1, "buyStep": 5, "wiltAfterMinute": 840, "color": "#3E8E41" },
+  { "id": "ca", "name": "Cà chua", "unit": "ký", "buy": 16, "sell": 26, "spoilRate": 0.4, "buyStep": 2, "color": "#D62828" },
+  { "id": "thit", "name": "Thịt heo", "unit": "ký", "buy": 105, "sell": 140, "spoilRate": 0.6, "buyStep": 1, "color": "#E8A0A0" }
+]

@@ -1,0 +1,10 @@
+[
+  { "id": "rain_longan", "text": "Mưa lớn ở Long An, rau về ít. Rau muống nhập lên giá, bán cũng lên theo.", "buyMod": { "rau": 1.5 }, "sellMod": { "rau": 1.3 } },
+  { "id": "pig_flu", "text": "Dịch tả heo ở mấy tỉnh miền Tây, thịt heo nhập lên giá. Bà con chú ý.", "buyMod": { "thit": 1.3 }, "sellMod": { "thit": 1.2 } },
+  { "id": "nice_day", "text": "Hôm nay trời đẹp, nắng nhẹ, bà con đi chợ đông vui.", "spawnMod": 1.3 },
+  { "id": "dalat_tomato", "text": "Cà chua Đà Lạt trúng mùa, giá nhập rẻ, giá bán cũng xuống.", "buyMod": { "ca": 0.6 }, "sellMod": { "ca": 0.8 } },
+  { "id": "storm", "text": "Đài báo chiều nay có mưa giông, bà con đi chợ nhớ mang áo mưa.", "spawnMod": 0.8 },
+  { "id": "neutral_vaccine", "text": "Phường thông báo: thứ Bảy này tiêm ngừa cho chó mèo miễn phí tại nhà văn hóa.", "neutral": true },
+  { "id": "neutral_cleanup", "text": "Chủ nhật này tổng vệ sinh khu phố, bà con nhớ dọn dẹp trước cửa nhà.", "neutral": true },
+  { "id": "neutral_lost", "text": "Ai lượm được cái ví màu nâu có giấy tờ tên Nguyễn Văn Tèo, xin gửi lại ban quản lý chợ.", "neutral": true }
+]

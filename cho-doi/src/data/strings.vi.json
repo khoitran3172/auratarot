@@ -1,0 +1,182 @@
+{
+  "title": {
+    "sign": "Chợ Đời",
+    "sub": "Sạp nhỏ Chợ Lớn",
+    "continue": "Chơi tiếp",
+    "new": "Chơi mới",
+    "settings": "Cài đặt",
+    "confirmNew": "Chơi mới sẽ xóa sổ sách cũ. Chắc chưa?",
+    "rao": "Rau muống tươi đây! Cà chua Đà Lạt đây!"
+  },
+  "create": {
+    "heading": "Ra chợ",
+    "name": "Tên của bạn",
+    "namePh": "Ví dụ: Hạnh, Tuấn…",
+    "gender": "Khách gọi bạn là",
+    "m": "Anh / con trai",
+    "f": "Chị / con gái",
+    "origin": "Xuất thân",
+    "pet": "Tên con mèo mướp ở sạp",
+    "petPh": "Ví dụ: Mướp",
+    "start": "Ra chợ",
+    "money": "Vốn {money}k",
+    "needName": "Nhập tên giùm cái đã"
+  },
+  "hud": {
+    "via": "Vía",
+    "rep": "Uy tín",
+    "deo": "Dẻo miệng",
+    "debts": "Sổ nợ",
+    "menu": "Cài đặt",
+    "viaLabels": ["xui", "thường", "hên", "hên như bắp"]
+  },
+  "wholesale": {
+    "title": "Chợ đầu mối Bình Điền",
+    "time": "{time} sáng",
+    "news": "Loa phường",
+    "colItem": "Món",
+    "buy": "Nhập",
+    "sell": "Bán dự kiến",
+    "have": "Đang có",
+    "total": "Tổng tiền hàng",
+    "wallet": "Tiền trong túi",
+    "incense": "Thắp nhang ông Địa",
+    "incenseHint": "2k · Vía +8 · ngày 1 lần",
+    "incenseDone": "Đã thắp nhang",
+    "go": "Chở hàng ra sạp",
+    "notEnough": "Hông đủ tiền",
+    "holiday": "Ngày rằm, ngày mùng: rau bán giá hơn, Bà Bảy Chùa ghé mua.",
+    "collected": "Sáng nay thu nợ được {money}k từ {who}.",
+    "loanTaken": "Bà Chín cho mượn 100k. Cuối ngày trả 110k."
+  },
+  "market": {
+    "serve": "Tiếp {name}",
+    "noCustomer": "Chờ khách…",
+    "clearance": "Cầm loa xả hàng",
+    "clearanceOn": "ĐỒNG GIÁ! XẢ HÀNG!",
+    "close": "Dọn sạp về",
+    "opening": "Khách mở hàng",
+    "openingWin": "Mở hàng suôn sẻ! Vía +8",
+    "openingLose": "Khách mở hàng bỏ đi… Vía −12",
+    "left": "{name} bỏ đi",
+    "sold": "Bán {qty} {unit} {item} cho {name}: {price}k",
+    "credit": "{name} ghi sổ {price}k",
+    "praise": "Bà Tám đi khen khắp chợ! Khách ghé đông hơn.",
+    "karaoke": "Anh Hai hát karaoke trước sạp, khách ngại ghé.",
+    "closing": "18 giờ rồi, dọn sạp thôi.",
+    "outOfStock": "Hết hàng rồi!",
+    "headFirst": "Tiếp khách đứng đầu hàng trước nha",
+    "deoMilestone": "Dẻo miệng đạt {deo}! Ăn nói ngày càng lanh.",
+    "pause": "Tạm dừng",
+    "resume": "Tiếp tục"
+  },
+  "haggle": {
+    "yourPrice": "Giá của mình {list}k, khách trả {offer}k",
+    "clearancePrice": "Giá xả {list}k",
+    "continue": "Tiếp tục bán",
+    "leftTag": "bỏ đi",
+    "tactics": {
+      "accept": { "label": "Bán theo giá khách", "hint": "Chắc ăn · Uy tín +0.5" },
+      "sob": { "label": "Kể khổ", "hint": "{rate}% · thêm nửa phần chênh" },
+      "flatter": { "label": "Nịnh khéo", "hint": "{rate}% · thêm 80% chênh, Uy tín +1" },
+      "onion": { "label": "Tặng nắm hành", "hint": "Tốn 1k · thêm nửa phần chênh" },
+      "hold": { "label": "Giữ giá", "hint": "{rate}% · hỏng thì khách bỏ đi" },
+      "candy": { "label": "Tặng cục kẹo", "hint": "Tốn 1k · Vía +5" },
+      "sell": { "label": "Bán", "hint": "Đúng giá" },
+      "sellFull": { "label": "Bán đúng giá", "hint": "Bà không trả giá" },
+      "charity": { "label": "Bớt cho bà làm phước", "hint": "Giá ×0.9 · Vía +6, Uy tín +2" },
+      "upsell": { "label": "Nhắc chú mua thêm", "hint": "Bán thêm 1 {unit} · Uy tín +1" },
+      "credit": { "label": "Cho ghi sổ", "hint": "Vào sổ nợ · Uy tín +1" },
+      "cash": { "label": "Trả tiền mặt nha chú", "hint": "{rate}% · hỏng thì chú bỏ đi" }
+    },
+    "outcome": {
+      "sold": "+{price}k",
+      "tip": "Ông Sáu cho luôn {tip}k tiền lẻ",
+      "credit": "Ghi sổ {price}k",
+      "left": "Khách bỏ đi"
+    }
+  },
+  "gangster": {
+    "title": "Anh Hai Dây Chuyền ghé",
+    "continue": "Xong chuyện"
+  },
+  "endOfDay": {
+    "title": "Sổ cuối ngày",
+    "revenue": "Bán được",
+    "cost": "Tiền nhập hàng",
+    "fees": "Phí và chi lặt vặt",
+    "profit": "Lời / lỗ",
+    "spoiled": "Hàng hư bỏ",
+    "left": "Hàng còn để mai",
+    "debts": "Sổ nợ khách",
+    "loan": "Nợ bà Chín",
+    "wallet": "Tiền trong túi",
+    "sleep": "Đi ngủ, mai dậy sớm",
+    "marketFee": "Phí ban quản lý",
+    "none": "không có",
+    "saved": "Đã lưu"
+  },
+  "debtBook": {
+    "title": "Sổ nợ",
+    "empty": "Chưa ai nợ. Sổ sạch trơn.",
+    "since": "từ {date}",
+    "close": "Đóng sổ"
+  },
+  "settings": {
+    "title": "Cài đặt",
+    "music": "Nhạc nền",
+    "sfx": "Tiếng rao, tiếng tiền",
+    "speed": "Tốc độ game",
+    "theme": "Giao diện",
+    "themeAuto": "Theo máy",
+    "themeLight": "Sáng",
+    "themeDark": "Tối",
+    "wipe": "Xóa dữ liệu",
+    "wipeConfirm": "Xóa hết sổ sách, chơi lại từ đầu? Không lấy lại được đâu.",
+    "yes": "Xóa luôn",
+    "no": "Thôi",
+    "close": "Xong",
+    "toTitle": "Về màn hình chính"
+  },
+  "calendar": {
+    "mung": "Mùng {d} tháng {m}",
+    "ram": "Rằm tháng {m}",
+    "plain": "{d} tháng {m}",
+    "months": ["Giêng", "Hai", "Ba", "Tư", "Năm", "Sáu", "Bảy", "Tám", "Chín", "Mười", "Mười Một", "Chạp"],
+    "midAutumn": "Trung Thu"
+  },
+  "story": {
+    "speakers": { "bachin": "Bà Chín", "anhhai": "Anh Hai Dây Chuyền", "ongnam": "Ông Năm", "you": "{name}" },
+    "day1_wholesale": [
+      ["bachin", "Dậy rồi hả {xung}? Bà Chín nè, bán sạp kế bên má {xung} hai chục năm."],
+      ["bachin", "Má {xung} dặn bà dắt {xung} đi chợ đầu mối bữa đầu. Nghe loa phường trước, tin nào làm giá lên giá xuống đó."],
+      ["bachin", "Lấy hàng vừa sức thôi. Rau muống qua đêm là héo bỏ hết, thịt với cà còn để được chút."],
+      ["bachin", "Còn nữa: thắp cây nhang ông Địa. Hai ngàn thôi mà lấy vía cả ngày."]
+    ],
+    "day1_market": [
+      ["bachin", "Ra sạp rồi. Người khách đầu tiên là khách mở hàng, bán được thì cả ngày hên, để khách bỏ đi là xui đó."],
+      ["bachin", "Khách tới đứng xếp hàng. Bấm vào khách đầu hàng mà tiếp, chờ lâu là người ta bỏ đi."],
+      ["bachin", "Khách trả giá thì mình có chiêu: kể khổ, nịnh, tặng hành… Coi mặt khách mà dùng."]
+    ],
+    "day1_end": [
+      ["bachin", "Hết ngày rồi. Coi sổ đi, lời lỗ nhiêu ghi rõ ràng. Mai dậy sớm nữa nha."]
+    ],
+    "day2_market": [
+      ["anhhai", "Ê, mặt lạ ha. Con của bà chủ sạp này hả? Anh Hai Dây Chuyền nè."],
+      ["anhhai", "Khu này anh trông. Ba bữa anh ghé thu chút phí trông sạp, bao êm."],
+      ["bachin", "Kệ nó {xung}. Nó nói to chớ hiền khô à. Có điều đừng để nó ôm loa ra hát."]
+    ],
+    "day3_end": [
+      ["ongnam", "Chợ này hồi trước toàn ghe xuồng chở hàng lên, chú bán ở đây từ hồi còn để tóc dài."],
+      ["ongnam", "Má {xung} với chú dựng cái sạp này bằng mấy cây tre với tấm bạt xanh đó."],
+      ["ongnam", "Mà nghe nói… phường sắp giải tỏa khu này, xây trung tâm thương mại. Chưa biết thiệt hay đồn."],
+      ["ongnam", "Thôi, còn bán ngày nào thì bán cho đàng hoàng ngày đó. Mai chú ghé."]
+    ],
+    "next": "Tiếp",
+    "done": "Rồi, hiểu"
+  },
+  "common": {
+    "k": "{n}k",
+    "ok": "OK"
+  }
+}
